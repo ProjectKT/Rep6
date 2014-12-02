@@ -1,0 +1,50 @@
+cse$ cd ~/workspace/BackwardChain
+cse$ java -cp bin RuleBaseSystem "?x is an Accord Wagon,?y is a Ferrari F50"
+java RuleBaseSystem "?x is an Accord Wagon,?y is a Ferrari F50"
+Hypothesis:[?x is an Accord Wagon, ?y is a Ferrari F50]
+Success RULE
+Rule:CarRule11 [?x10 is a Honda, ?x10 is stylish, ?x10 has several color models, ?x10 has several seats, ?x10 is a wagon]->?x10 is an Accord Wagon <=> ?x is an Accord Wagon
+Success RULE
+Rule:CarRule7 [?x17 is made in Japan, ?x17 has Honda's logo]->?x17 is a Honda <=> ?x10 is a Honda
+Success RULE
+Rule:CarRule1 [?x18 is inexpensive]->?x18 is made in Japan <=> ?x17 is made in Japan
+Success WM
+his-car is inexpensive <=> ?x18 is inexpensive
+Success RULE
+Rule:CarRule8 [?x34 is made in Japan, ?x34 has a VTEC engine]->?x34 is a Honda <=> ?x10 is a Honda
+Success RULE
+Rule:CarRule1 [?x35 is inexpensive]->?x35 is made in Japan <=> ?x34 is made in Japan
+Success WM
+his-car is inexpensive <=> ?x35 is inexpensive
+Success WM
+his-car has a VTEC engine <=> ?x34 has a VTEC engine
+Success WM
+his-car is stylish <=> ?x10 is stylish
+Success WM
+his-car has several color models <=> ?x10 has several color models
+Success WM
+his-car has several seats <=> ?x10 has several seats
+Success WM
+his-car is a wagon <=> ?x10 is a wagon
+Success RULE
+Rule:CarRule14 [?x49 is a foreign car, ?x49 is a sports car, ?x49 is red, ?x49 has a big engine]->?x49 is a Ferrari F50 <=> ?y is a Ferrari F50
+Success RULE
+Rule:CarRule3 [?x52 is expensive]->?x52 is a foreign car <=> ?x49 is a foreign car
+Success RULE
+Rule:CarRule4 [?x68 is big, ?x68 needs a lot of gas]->?x68 is a foreign car <=> ?x49 is a foreign car
+Success WM
+Ito's-Car is big <=> ?x68 is big
+Success WM
+Ito's-Car needs a lot of gas <=> ?x68 needs a lot of gas
+Success WM
+Ito's-Car is a sports car <=> ?x49 is a sports car
+Success WM
+Ito's-Car is red <=> ?x49 is red
+Success WM
+Ito's-Car has a big engine <=> ?x49 has a big engine
+Yes
+{?x49=Ito's-Car, ?x10=his-car, ?x68=Ito's-Car, ?y=Ito's-Car, ?x=his-car, ?x35=his-car, ?x34=his-car}
+Query: ?x is an Accord Wagon
+Answer:his-car is an Accord Wagon
+Query: ?y is a Ferrari F50
+Answer:Ito's-Car is a Ferrari F50

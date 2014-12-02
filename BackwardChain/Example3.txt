@@ -1,0 +1,37 @@
+cse$ cd ~/workspace/BackwardChain
+cse$ java -cp bin RuleBaseSystem "?x is an Accord Wagon"
+Hypothesis:[?x is an Accord Wagon]
+Success RULE
+Rule:CarRule11 [?x10 is a Honda, ?x10 is stylish, ?x10 has several color models, ?x10 has several seats, ?x10 is a wagon]->?x10 is an Accord Wagon <=> ?x is an Accord Wagon
+Success RULE
+Rule:CarRule7 [?x17 is made in Japan, ?x17 has Honda's logo]->?x17 is a Honda <=> ?x10 is a Honda
+Success RULE
+Rule:CarRule1 [?x18 is inexpensive]->?x18 is made in Japan <=> ?x17 is made in Japan
+Success WM
+his-car is inexpensive <=> ?x18 is inexpensive
+Success:?x17 is made in Japan
+Success RULE
+Rule:CarRule8 [?x37 is made in Japan, ?x37 has a VTEC engine]->?x37 is a Honda <=> ?x10 is a Honda
+Success RULE
+Rule:CarRule1 [?x38 is inexpensive]->?x38 is made in Japan <=> ?x37 is made in Japan
+Success WM
+his-car is inexpensive <=> ?x38 is inexpensive
+Success:?x37 is made in Japan
+Success WM
+his-car has a VTEC engine <=> ?x37 has a VTEC engine
+Success:?x10 is a Honda
+Success WM
+his-car is stylish <=> ?x10 is stylish
+Success:?x10 is stylish
+Success WM
+his-car has several color models <=> ?x10 has several color models
+Success:?x10 has several color models
+Success WM
+his-car has several seats <=> ?x10 has several seats
+Success:?x10 has several seats
+Success WM
+his-car is a wagon <=> ?x10 is a wagon
+Yes
+{?x38=his-car, ?x37=his-car, ?x=his-car, ?x10=his-car}
+Query: ?x is an Accord Wagon
+Answer:his-car is an Accord Wagon
