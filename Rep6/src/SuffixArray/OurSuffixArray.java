@@ -30,17 +30,17 @@ public class OurSuffixArray extends SuffixArray{
 	
 	private void setupSuffixArray(){
 		for(int i = 0; i < rules.size(); i++){
-			add_Suffix_rule(rules.get(i));
+			addSuffixRule(rules.get(i));
 		}
 		for(int i2 = 0; i2 < wm.size(); i2++){
-			add_Suffix_wm(wm.get(i2));
+			addSuffixWm(wm.get(i2));
 		}
 	}
 	
 	public static void main(String[] args) {
 		OurSuffixArray osa = new OurSuffixArray();
 		
-		Iterator it = osa.get_sentences("has");
+		Iterator it = osa.getSentences("has");
 		while(it.hasNext()){
 			System.out.println(it.next());
 		}

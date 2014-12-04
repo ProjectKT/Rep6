@@ -1,6 +1,7 @@
 package SuffixArray;
 
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -22,7 +23,7 @@ public class SuffixData {
 	/**
 	 * Mapで使っているならtrue Listで使っているならfalse
 	 */
-	private boolean mode_flag;
+	private boolean modeFlag;
 
 	/**
 	 * Mapで使う場合のコンストラクタ
@@ -31,7 +32,7 @@ public class SuffixData {
 		words = new TreeSet<String>();
 		sentences = new TreeSet<String>();
 		rules = new TreeMap<String,Rule>();
-		mode_flag = true;
+		modeFlag = true;
 	}
 
 	/**
@@ -43,35 +44,35 @@ public class SuffixData {
 		sentences = new TreeSet<String>();
 		rules = new TreeMap<String,Rule>();
 		this.LCP = LCP;
-		mode_flag = false;
+		modeFlag = false;
 	}
 	
-	void add_word(String word){
+	void addWord(String word){
 		words.add(word);
 	}
 	
-	void add_sentence(String sentence){
+	void addSentence(String sentence){
 		sentences.add(sentence);
 	}
 	
-	void add_rule(Rule rule){
+	void addRule(Rule rule){
 		if(rule != null)
 		rules.put(rule.getName(),rule);
 	}
 
-	Iterator get_words() {
+	Iterator<String> getWords() {
 		return words.iterator();
 	}
 
-	Iterator get_sentences() {
+	Iterator<String> getSentences() {
 		return sentences.iterator();
 	}
 
-	Iterator get_rules() {
+	Iterator<Entry<String, Rule>> getRules() {
 		return rules.entrySet().iterator();
 	}
 
-	int get_LCP() {
+	int getLCP() {
 		return LCP;
 	}
 }

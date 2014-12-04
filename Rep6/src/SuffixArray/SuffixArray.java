@@ -3,6 +3,7 @@ package SuffixArray;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -19,17 +20,17 @@ public class SuffixArray {
 	 * ワーキングメモリを受け取りSuffixArrayに追加処理　新しいワーキングメモリを追加する時用
 	 * @param wm
 	 */
-	public void add_Suffix_wm(String wm){
+	public void addSuffixWm(String wm){
 		// 受け取った文を単語に分割
 		String[] wordlist = wm.split(" ");
 		String sentence= "?x";
 		for (int i = 1; i < wordlist.length; i++) {
 			// 分割した単語のそれぞれを追加(先頭は固有名詞なので無視)
-			add_Suffix_word(wordlist[i],null);
+			addSuffixWord(wordlist[i],null);
 			sentence = sentence + " " + wordlist[i];
 		}
 		//wmにある知識の固有名詞部を?xに変えてSuffixArrayに追加
-		add_Suffix_sentence(sentence,null);
+		addSuffixSentence(sentence,null);
 	}
 
 	/**
@@ -37,14 +38,14 @@ public class SuffixArray {
 	 * 
 	 * @param rule
 	 */
-	public void add_Suffix_rule(Rule rule) {
+	public void addSuffixRule(Rule rule) {
 		ArrayList<String> antecedents = rule.getAntecedents();
 		for (int i = 0; i < antecedents.size(); i++) {
 			// 前件を登録
-			add_Suffix_sentence(antecedents.get(i), rule);
+			addSuffixSentence(antecedents.get(i), rule);
 		}
 		// 後件を登録
-		add_Suffix_sentence(rule.getConsequent(), rule);
+		addSuffixSentence(rule.getConsequent(), rule);
 	}
 
 	/**
@@ -54,19 +55,19 @@ public class SuffixArray {
 	 *            「?x is a foreign car」のような文章
 	 * @param rule
 	 */
-	private void add_Suffix_sentence(String sentence, Rule rule) {
+	private void addSuffixSentence(String sentence, Rule rule) {
 
 		// まず文をSuffixArrayに追加する
 		for (int i = 0; i < sentence.length(); i++) {
-			put_Suffix_sentence(sentence.substring(i), sentence);
-			put_Suffix_rule(sentence.substring(i), rule);
+			putSuffixSentence(sentence.substring(i), sentence);
+			putSuffixRule(sentence.substring(i), rule);
 		}
 
 		// 受け取った文を単語に分割
 		String[] wordlist = sentence.split(" ");
 		for (int i2 = 0; i2 < wordlist.length; i2++) {
 			// 分割した単語のそれぞれを追加
-			add_Suffix_word(wordlist[i2], rule);
+			addSuffixWord(wordlist[i2], rule);
 		}
 	}
 
@@ -76,10 +77,10 @@ public class SuffixArray {
 	 * @param word
 	 * @param rule
 	 */
-	private void add_Suffix_word(String word, Rule rule) {
+	private void addSuffixWord(String word, Rule rule) {
 		for (int i = 0; i < word.length(); i++) {
-			put_Suffix_word(word.substring(i), word);
-			put_Suffix_rule(word.substring(i), rule);
+			putSuffixWord(word.substring(i), word);
+			putSuffixRule(word.substring(i), rule);
 		}
 	}
 
@@ -89,14 +90,14 @@ public class SuffixArray {
 	 * @param suffix
 	 * @param string
 	 */
-	private void put_Suffix_word(String suffix, String word) {
+	private void putSuffixWord(String suffix, String word) {
 		// 新しいSuffixならSuffixArrayにput
 		if (!SuffixArray.containsKey(suffix)) {
 			SuffixData data = new SuffixData();
 			SuffixArray.put(suffix, data);
 		}
 
-		SuffixArray.get(suffix).add_word(word);
+		SuffixArray.get(suffix).addWord(word);
 	}
 	
 	/**
@@ -105,14 +106,14 @@ public class SuffixArray {
 	 * @param suffix
 	 * @param string
 	 */
-	private void put_Suffix_sentence(String suffix, String sentence) {
+	private void putSuffixSentence(String suffix, String sentence) {
 		// 新しいSuffixならSuffixArrayにput
 		if (!SuffixArray.containsKey(suffix)) {
 			SuffixData data = new SuffixData();
 			SuffixArray.put(suffix, data);
 		}
 
-		SuffixArray.get(suffix).add_sentence(sentence);
+		SuffixArray.get(suffix).addSentence(sentence);
 	}
 
 	/**
@@ -121,16 +122,16 @@ public class SuffixArray {
 	 * @param suffix
 	 * @param rule
 	 */
-	private void put_Suffix_rule(String suffix, Rule rule) {
-		SuffixArray.get(suffix).add_rule(rule);
+	private void putSuffixRule(String suffix, Rule rule) {
+		SuffixArray.get(suffix).addRule(rule);
 	}
 
-	private Iterator set_suffix_tree(String word) {
+	private Iterator<String> setSuffixTree(String word) {
 		int wordl = word.length();
 		suffixs.clear();
 		boolean end = false;
-		for (Iterator it = SuffixArray.entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
+		for (Iterator<Entry<String,SuffixData>> it = SuffixArray.entrySet().iterator(); it.hasNext();) {
+			Entry<String,SuffixData> entry = it.next();
 			String key = (String) entry.getKey();
 			if (key.length() >= word.length()) {
 				if (key.substring(0, wordl).equalsIgnoreCase(word)) {
@@ -152,13 +153,13 @@ public class SuffixArray {
 	 * @param suffix
 	 * @return
 	 */
-	public Iterator get_rules(String word) {
+	public Iterator<Entry<String,Rule>> getRules(String word) {
 		TreeMap<String,Rule> rules = new TreeMap<String,Rule>();
-		Iterator it = set_suffix_tree(word);
+		Iterator<String> it = setSuffixTree(word);
 		while (it.hasNext()) {
-			Iterator it2 = SuffixArray.get(it.next()).get_rules();
+			Iterator<Entry<String, Rule>> it2 = SuffixArray.get(it.next()).getRules();
 			while (it2.hasNext()) {
-				Map.Entry entry = (Map.Entry)it2.next();
+				Entry<String, Rule> entry = it2.next();
 				String key = (String) entry.getKey();
 			    Rule value = (Rule) entry.getValue();
 			    rules.put(key,value);
@@ -174,13 +175,13 @@ public class SuffixArray {
 	 * @param suffix
 	 * @return
 	 */
-	public Iterator get_sentences(String word) {
+	public Iterator<String> getSentences(String word) {
 		TreeSet<String> sentences = new TreeSet<String>();
-		Iterator it = set_suffix_tree(word);
+		Iterator<String> it = setSuffixTree(word);
 		while (it.hasNext()) {
-			Iterator it2 = SuffixArray.get(it.next()).get_sentences();
+			Iterator<String> it2 = SuffixArray.get(it.next()).getSentences();
 			while (it2.hasNext()) {
-				sentences.add((String) it2.next());
+				sentences.add(it2.next());
 			}
 		}
 		return sentences.iterator();
@@ -193,13 +194,13 @@ public class SuffixArray {
 	 * @param suffix
 	 * @return
 	 */
-	public Iterator get_words(String word) {
+	public Iterator<String> getWords(String word) {
 		TreeSet<String> words = new TreeSet<String>();
-		Iterator it = set_suffix_tree(word);
+		Iterator<String> it = setSuffixTree(word);
 		while (it.hasNext()) {
-			Iterator it2 = SuffixArray.get(it.next()).get_words();
+			Iterator<String> it2 = SuffixArray.get(it.next()).getWords();
 			while (it2.hasNext()) {
-				words.add((String) it2.next());
+				words.add(it2.next());
 			}
 		}
 		return words.iterator();
