@@ -1,16 +1,23 @@
 package components;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JTextPane;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.EventType;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
+import javax.swing.plaf.basic.BasicTextPaneUI;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.GapContent;
 import javax.swing.text.StyleContext;
@@ -20,14 +27,17 @@ import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
+import utils.CharArrayTokenizer;
+
 /**
  * RuleBaseSystem のルールをハイライトする機能を持った JTextPane
  */
 public class HighlightedTextPane extends JTextPane implements DocumentListener, KeyListener {
 	
 	/** UndoManager */
-	private CustomUndoManager undoManager = new CustomUndoManager();
+	private final CustomUndoManager undoManager = new CustomUndoManager();
 	private CustomContent content;
+	private char[] delimiters = new char[]{' ','\n','\r','\t','\f'};
 	
 	// --- イベントリスナー ---
 	/** テキスト編集時に UndoManager に編集内容を伝えるイベントリスナー */
@@ -44,16 +54,17 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		document.addUndoableEditListener(undoableEditListener);
 		setDocument(document);
 		addKeyListener(this);
+		setUI(new HighlightedTextPaneUI(this));
 	}
 
 	@Override
-	public void insertUpdate(DocumentEvent e) { updateStyle(); }
+	public void insertUpdate(DocumentEvent e) { updateTokenStyle(); }
 
 	@Override
-	public void removeUpdate(DocumentEvent e) { updateStyle(); }
+	public void removeUpdate(DocumentEvent e) { updateTokenStyle(); }
 
 	@Override
-	public void changedUpdate(DocumentEvent e) { updateStyle(); }
+	public void changedUpdate(DocumentEvent e) { updateTokenStyle(); }
 
 	@Override
 	public void keyTyped(KeyEvent e) { }
@@ -79,7 +90,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	@Override
 	public void keyReleased(KeyEvent e) { }
 
-	private void updateStyle() {
+	private void updateTokenStyle() {
 		System.out.println("updateStyle(): getTokenAtCaret="+getTokenAtCaret());
 	}
 	
@@ -106,19 +117,8 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		 */
 		private String getTokenAtCaret() {
 			final int caretPosition = getCaretPosition();
-			char[] array = (char[]) getArray();
-			if (0 < caretPosition) {
-				int i;
-				for (i = caretPosition-1; i >= 0; i--) {
-					if (array[i] == ' ') {
-						break;
-					}
-				}
-				i = i+1;
-				System.out.println(caretPosition+", "+i);
-				return new String(array, i, (caretPosition-i));
-			}
-			return "";
+			CharArrayTokenizer at = new CharArrayTokenizer((char[]) getArray(), delimiters, true).from(caretPosition-1);
+			return at.hasMoreElements() ? at.nextToken() : "";
 		}
 	}
 	
@@ -143,7 +143,6 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 				}
 				
 				shouldMerge = shouldMerge && nextIsMergeable;
-				System.out.println("shouldMerge = "+shouldMerge);
 
 				nextIsMergeable = true;
 				if (shouldMerge && lastEdit != null) {
@@ -192,6 +191,38 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 				// canUndo(), canRedo() が常に false になるのを防ぐ
 				return false;
 			}
+		}
+	}
+}
+
+/**
+ * UI
+ */
+class HighlightedTextPaneUI extends BasicTextPaneUI {
+	JTextPane tc;
+	Color lineColor = Color.yellow;
+	
+	public HighlightedTextPaneUI(JTextPane t) {
+		this.tc = t;
+		tc.addCaretListener(new CaretListener() {
+			@Override
+			public void caretUpdate(CaretEvent e) {
+				tc.repaint();
+			}
+		});
+	}
+	
+	@Override
+	public void paintBackground(Graphics g) {
+		super.paintBackground(g);
+		try {
+			Rectangle rect = modelToView(tc, tc.getCaretPosition());
+			int y = rect.y;
+			int h = rect.height;
+			g.setColor(lineColor);
+			g.fillRect(0, y, tc.getWidth(), h);
+		} catch (BadLocationException ex) {
+			ex.printStackTrace();
 		}
 	}
 }
