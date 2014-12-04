@@ -26,6 +26,10 @@ public class CharArrayTokenizer implements Enumeration<String> {
 		return this;
 	}
 	
+	public int getCurrentPosition() {
+		return reverse ? (currentPosition+1) : currentPosition;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

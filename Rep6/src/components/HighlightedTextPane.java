@@ -6,8 +6,10 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -17,9 +19,11 @@ import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.plaf.basic.BasicTextPaneUI;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.GapContent;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleContext;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -34,10 +38,21 @@ import utils.CharArrayTokenizer;
  */
 public class HighlightedTextPane extends JTextPane implements DocumentListener, KeyListener {
 	
+	/** dummy interface implementation */
+	private static final TokenHighlighter sDummyTokenHighlighter = new TokenHighlighter() {
+		@Override
+		public AttributeSet getAttributeSetForToken(String token) { return null; }
+	};
+	
 	/** UndoManager */
 	private final CustomUndoManager undoManager = new CustomUndoManager();
 	private CustomContent content;
 	private char[] delimiters = new char[]{' ','\n','\r','\t','\f'};
+	private TokenHighlighter tokenHighlighter = sDummyTokenHighlighter;
+	/** default attribute set applied to tokens  when null AttributeSet is returned from {@link HighlightedTextPane#TokenHighlighter} */
+	private AttributeSet defaultAttributeSet = new SimpleAttributeSet();
+	/** キャレットの存在する行をハイライトする背景色 */
+	Color lineHighlightColor = new Color(0xfffbffbb);
 	
 	// --- イベントリスナー ---
 	/** テキスト編集時に UndoManager に編集内容を伝えるイベントリスナー */
@@ -54,17 +69,42 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		document.addUndoableEditListener(undoableEditListener);
 		setDocument(document);
 		addKeyListener(this);
-		setUI(new HighlightedTextPaneUI(this));
+		setUI(new HighlightedTextPane.UI());
+	}
+	
+	/**
+	 * TokenHighlighter を設定する
+	 * @param tokenHighlighter
+	 */
+	public void setTokenHighlighter(TokenHighlighter tokenHighlighter) {
+		this.tokenHighlighter = (tokenHighlighter == null) ? sDummyTokenHighlighter : tokenHighlighter;
+	}
+	
+	/**
+	 * デフォルトの AttributeSet を設定する
+	 * @param attr
+	 */
+	public void setDefaultAttributeSet(AttributeSet attr) {
+		defaultAttributeSet = attr;
+		updateWholeTokenStyle();
+	}
+	
+	/**
+	 * キャレットの存在する行をハイライトする背景色を設定する
+	 * @param color
+	 */
+	public void setLineHighlightColor(Color color) {
+		lineHighlightColor = color;
 	}
 
 	@Override
-	public void insertUpdate(DocumentEvent e) { updateTokenStyle(); }
+	public void insertUpdate(DocumentEvent e) { updateEditingTokenStyle(); }
 
 	@Override
-	public void removeUpdate(DocumentEvent e) { updateTokenStyle(); }
+	public void removeUpdate(DocumentEvent e) { updateEditingTokenStyle(); }
 
 	@Override
-	public void changedUpdate(DocumentEvent e) { updateTokenStyle(); }
+	public void changedUpdate(DocumentEvent e) { /*updateTokenStyle();*/ }
 
 	@Override
 	public void keyTyped(KeyEvent e) { }
@@ -89,13 +129,41 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 
 	@Override
 	public void keyReleased(KeyEvent e) { }
-
-	private void updateTokenStyle() {
-		System.out.println("updateStyle(): getTokenAtCaret="+getTokenAtCaret());
+	
+	public void setCharacterAttributes(final int offset, final int length, final AttributeSet s, final boolean replace) throws InvocationTargetException {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				getStyledDocument().setCharacterAttributes(offset, length, s, replace);
+			}
+		});
 	}
 	
-	private String getTokenAtCaret() {
-		return content.getTokenAtCaret();
+	/**
+	 * ドキュメント全体のトークンのハイライトを更新する
+	 */
+	private void updateWholeTokenStyle() {
+		// TODO implement this method
+	}
+
+	/**
+	 * 編集中のトークンのハイライトを更新する
+	 */
+	private void updateEditingTokenStyle() {
+		CharArrayTokenizer at = content.getReverseEditTokenizer();
+		if (at.hasMoreElements()) {
+			String token = at.nextToken();
+			int start = at.getCurrentPosition();
+			if (0 <= start) {
+				AttributeSet attr = tokenHighlighter.getAttributeSetForToken(token);
+				attr = (attr == null) ? defaultAttributeSet : attr;
+				try {
+					setCharacterAttributes(start, token.length(), attr, true);
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	/**
@@ -112,13 +180,12 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	 */
 	protected class CustomContent extends GapContent {
 		/**
-		 * キャレットの前のトークンを返す
-		 * @return トークン
+		 * 編集中の(キャレットの位置の)トークンが初期位置になった逆方向への CharArrayTokenizer を返す
+		 * @return
 		 */
-		private String getTokenAtCaret() {
+		public CharArrayTokenizer getReverseEditTokenizer() {
 			final int caretPosition = getCaretPosition();
-			CharArrayTokenizer at = new CharArrayTokenizer((char[]) getArray(), delimiters, true).from(caretPosition-1);
-			return at.hasMoreElements() ? at.nextToken() : "";
+			return new CharArrayTokenizer((char[]) getArray(), delimiters, true).from(caretPosition-1);
 		}
 	}
 	
@@ -134,6 +201,11 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 			if (anEdit instanceof AbstractDocument.DefaultDocumentEvent) {
 				final EventType lastEditType = (lastEdit == null) ? null : ((MultiEdit) lastEdit).lastEventType;
 				final EventType theEditType = ((AbstractDocument.DefaultDocumentEvent) anEdit).getType();
+				
+				// プログラム側からの変更(スタイルの変更等)なら無視
+				if (theEditType == EventType.CHANGE) {
+					return false;
+				}
 				
 				boolean shouldMerge = false;
 
@@ -193,36 +265,39 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 			}
 		}
 	}
-}
 
-/**
- * UI
- */
-class HighlightedTextPaneUI extends BasicTextPaneUI {
-	JTextPane tc;
-	Color lineColor = Color.yellow;
-	
-	public HighlightedTextPaneUI(JTextPane t) {
-		this.tc = t;
-		tc.addCaretListener(new CaretListener() {
-			@Override
-			public void caretUpdate(CaretEvent e) {
-				tc.repaint();
-			}
-		});
+	/**
+	 * TokenHighlighter interface
+	 */
+	public interface TokenHighlighter {
+		public AttributeSet getAttributeSetForToken(String token);
 	}
 	
-	@Override
-	public void paintBackground(Graphics g) {
-		super.paintBackground(g);
-		try {
-			Rectangle rect = modelToView(tc, tc.getCaretPosition());
-			int y = rect.y;
-			int h = rect.height;
-			g.setColor(lineColor);
-			g.fillRect(0, y, tc.getWidth(), h);
-		} catch (BadLocationException ex) {
-			ex.printStackTrace();
+	/**
+	 * UI
+	 */
+	protected class UI extends BasicTextPaneUI {
+		public UI() {
+			addCaretListener(new CaretListener() {
+				@Override
+				public void caretUpdate(CaretEvent e) {
+					HighlightedTextPane.this.repaint();
+				}
+			});
+		}
+		
+		@Override
+		public void paintBackground(Graphics g) {
+			super.paintBackground(g);
+			try {
+				Rectangle rect = modelToView(HighlightedTextPane.this, HighlightedTextPane.this.getCaretPosition());
+				int y = rect.y;
+				int h = rect.height;
+				g.setColor(lineHighlightColor);
+				g.fillRect(0, y, HighlightedTextPane.this.getWidth(), h);
+			} catch (BadLocationException ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 }
