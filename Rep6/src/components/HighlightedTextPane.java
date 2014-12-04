@@ -20,6 +20,8 @@ import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
+import utils.CharArrayTokenizer;
+
 /**
  * RuleBaseSystem のルールをハイライトする機能を持った JTextPane
  */
@@ -28,6 +30,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	/** UndoManager */
 	private CustomUndoManager undoManager = new CustomUndoManager();
 	private CustomContent content;
+	private char[] delimiters = new char[]{' ','\n','\r','\t','\f'};
 	
 	// --- イベントリスナー ---
 	/** テキスト編集時に UndoManager に編集内容を伝えるイベントリスナー */
@@ -47,13 +50,13 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	}
 
 	@Override
-	public void insertUpdate(DocumentEvent e) { updateStyle(); }
+	public void insertUpdate(DocumentEvent e) { updateTokenStyle(); }
 
 	@Override
-	public void removeUpdate(DocumentEvent e) { updateStyle(); }
+	public void removeUpdate(DocumentEvent e) { updateTokenStyle(); }
 
 	@Override
-	public void changedUpdate(DocumentEvent e) { updateStyle(); }
+	public void changedUpdate(DocumentEvent e) { updateTokenStyle(); }
 
 	@Override
 	public void keyTyped(KeyEvent e) { }
@@ -79,7 +82,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	@Override
 	public void keyReleased(KeyEvent e) { }
 
-	private void updateStyle() {
+	private void updateTokenStyle() {
 		System.out.println("updateStyle(): getTokenAtCaret="+getTokenAtCaret());
 	}
 	
@@ -106,19 +109,8 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		 */
 		private String getTokenAtCaret() {
 			final int caretPosition = getCaretPosition();
-			char[] array = (char[]) getArray();
-			if (0 < caretPosition) {
-				int i;
-				for (i = caretPosition-1; i >= 0; i--) {
-					if (array[i] == ' ') {
-						break;
-					}
-				}
-				i = i+1;
-				System.out.println(caretPosition+", "+i);
-				return new String(array, i, (caretPosition-i));
-			}
-			return "";
+			CharArrayTokenizer at = new CharArrayTokenizer((char[]) getArray(), delimiters, true).from(caretPosition-1);
+			return at.hasMoreElements() ? at.nextToken() : "";
 		}
 	}
 	
@@ -143,7 +135,6 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 				}
 				
 				shouldMerge = shouldMerge && nextIsMergeable;
-				System.out.println("shouldMerge = "+shouldMerge);
 
 				nextIsMergeable = true;
 				if (shouldMerge && lastEdit != null) {
