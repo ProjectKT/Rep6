@@ -9,6 +9,7 @@ class FileManager {
 	FileReader f;
 	StreamTokenizer st;
 
+	
 	public ArrayList<Rule> loadRules(String theFileName) {
 		ArrayList<Rule> rules = new ArrayList<Rule>();
 		String line;

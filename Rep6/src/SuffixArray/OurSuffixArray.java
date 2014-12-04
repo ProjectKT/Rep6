@@ -7,10 +7,10 @@ import java.io.*;
 
 public class OurSuffixArray extends SuffixArray{
 	static FileManager fm;
-	ArrayList<Rule> rules;
-	ArrayList<String> wm;
-	private static final String[] RULE_FILES = {"AnimalWorld.data"};
-	private static final String[] WM_FILES = {"AnimalWorldWm.data"};
+	ArrayList<Rule> rules = new ArrayList<Rule>();
+	ArrayList<String> wm = new ArrayList<String>();
+	private static final String[] RULE_FILES = {"AnimalWorld.data","CarShop.data"};
+	private static final String[] WM_FILES = {"AnimalWorldWm.data","CarShopWm.data"};
 	
 	public OurSuffixArray(){
 		loadData();
@@ -21,16 +21,19 @@ public class OurSuffixArray extends SuffixArray{
 		fm = new FileManager();
 		// ファイルから読み込む
 		for (String filename : RULE_FILES) {
-				rules = fm.loadRules(filename);
+				rules.addAll(fm.loadRules(filename));
 		}
 		for (String filename : WM_FILES) {
-				wm = fm.loadWm(filename);
+				wm.addAll(fm.loadWm(filename));
 		}
 	}
 	
 	private void setupSuffixArray(){
 		for(int i = 0; i < rules.size(); i++){
 			add_Suffix_rule(rules.get(i));
+		}
+		for(int i2 = 0; i2 < wm.size(); i2++){
+			add_Suffix_wm(wm.get(i2));
 		}
 	}
 	

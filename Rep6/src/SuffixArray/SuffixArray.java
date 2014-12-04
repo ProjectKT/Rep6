@@ -14,6 +14,23 @@ public class SuffixArray {
 
 	// 投げられた文字列で始まるsuffixsを格納するTreeSet
 	private TreeSet<String> suffixs = new TreeSet<String>();
+	
+	/**
+	 * ワーキングメモリを受け取りSuffixArrayに追加処理　新しいワーキングメモリを追加する時用
+	 * @param wm
+	 */
+	public void add_Suffix_wm(String wm){
+		// 受け取った文を単語に分割
+		String[] wordlist = wm.split(" ");
+		String sentence= "?x";
+		for (int i = 1; i < wordlist.length; i++) {
+			// 分割した単語のそれぞれを追加(先頭は固有名詞なので無視)
+			add_Suffix_word(wordlist[i],null);
+			sentence = sentence + " " + wordlist[i];
+		}
+		//wmにある知識の固有名詞部を?xに変えてSuffixArrayに追加
+		add_Suffix_sentence(sentence,null);
+	}
 
 	/**
 	 * ルールを受け取りSuffixArrayに追加処理 新しいルールを追加する時用
@@ -136,15 +153,18 @@ public class SuffixArray {
 	 * @return
 	 */
 	public Iterator get_rules(String word) {
-		TreeSet<String> rules = new TreeSet<String>();
+		TreeMap<String,Rule> rules = new TreeMap<String,Rule>();
 		Iterator it = set_suffix_tree(word);
 		while (it.hasNext()) {
 			Iterator it2 = SuffixArray.get(it.next()).get_rules();
 			while (it2.hasNext()) {
-				rules.add((String) it2.next());
+				Map.Entry entry = (Map.Entry)it2.next();
+				String key = (String) entry.getKey();
+			    Rule value = (Rule) entry.getValue();
+			    rules.put(key,value);
 			}
 		}
-		return rules.iterator();
+		return rules.entrySet().iterator();
 
 	}
 

@@ -1,6 +1,7 @@
 package SuffixArray;
 
 import java.util.Iterator;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -15,7 +16,7 @@ public class SuffixData {
 	// 対応する文
 	private TreeSet<String> sentences;
 	// 対応するルール
-	private TreeSet<String> rules;
+	private TreeMap<String,Rule> rules;
 	// 前のSuffixとの一致数
 	private int LCP;
 	/**
@@ -29,7 +30,7 @@ public class SuffixData {
 	SuffixData() {
 		words = new TreeSet<String>();
 		sentences = new TreeSet<String>();
-		rules = new TreeSet<String>();
+		rules = new TreeMap<String,Rule>();
 		mode_flag = true;
 	}
 
@@ -40,7 +41,7 @@ public class SuffixData {
 	SuffixData(int LCP) {
 		words = new TreeSet<String>();
 		sentences = new TreeSet<String>();
-		rules = new TreeSet<String>();
+		rules = new TreeMap<String,Rule>();
 		this.LCP = LCP;
 		mode_flag = false;
 	}
@@ -54,7 +55,8 @@ public class SuffixData {
 	}
 	
 	void add_rule(Rule rule){
-		rules.add(rule.getName());
+		if(rule != null)
+		rules.put(rule.getName(),rule);
 	}
 
 	Iterator get_words() {
@@ -66,7 +68,7 @@ public class SuffixData {
 	}
 
 	Iterator get_rules() {
-		return rules.iterator();
+		return rules.entrySet().iterator();
 	}
 
 	int get_LCP() {
