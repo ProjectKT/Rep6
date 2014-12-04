@@ -12,7 +12,8 @@ import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Document;
+import javax.swing.text.GapContent;
+import javax.swing.text.StyleContext;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
@@ -22,10 +23,11 @@ import javax.swing.undo.UndoableEdit;
 /**
  * RuleBaseSystem のルールをハイライトする機能を持った JTextPane
  */
-public class RuleTextPane extends JTextPane implements DocumentListener, KeyListener {
+public class HighlightedTextPane extends JTextPane implements DocumentListener, KeyListener {
 	
 	/** UndoManager */
-	private RuleUndoManager undoManager = new RuleUndoManager();
+	private CustomUndoManager undoManager = new CustomUndoManager();
+	private CustomContent content;
 	
 	// --- イベントリスナー ---
 	/** テキスト編集時に UndoManager に編集内容を伝えるイベントリスナー */
@@ -36,8 +38,8 @@ public class RuleTextPane extends JTextPane implements DocumentListener, KeyList
 		}
 	};
 	
-	public RuleTextPane() {
-		RuleDocument document = new RuleDocument();
+	public HighlightedTextPane() {
+		CustomDocument document = new CustomDocument();
 		document.addDocumentListener(this);
 		document.addUndoableEditListener(undoableEditListener);
 		setDocument(document);
@@ -45,22 +47,13 @@ public class RuleTextPane extends JTextPane implements DocumentListener, KeyList
 	}
 
 	@Override
-	public void insertUpdate(DocumentEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void insertUpdate(DocumentEvent e) { updateStyle(); }
 
 	@Override
-	public void removeUpdate(DocumentEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void removeUpdate(DocumentEvent e) { updateStyle(); }
 
 	@Override
-	public void changedUpdate(DocumentEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void changedUpdate(DocumentEvent e) { updateStyle(); }
 
 	@Override
 	public void keyTyped(KeyEvent e) { }
@@ -86,19 +79,53 @@ public class RuleTextPane extends JTextPane implements DocumentListener, KeyList
 	@Override
 	public void keyReleased(KeyEvent e) { }
 
+	private void updateStyle() {
+		System.out.println("updateStyle(): getTokenAtCaret="+getTokenAtCaret());
+	}
+	
+	private String getTokenAtCaret() {
+		return content.getTokenAtCaret();
+	}
 	
 	/**
 	 * A customized Document
 	 */
-	protected class RuleDocument extends DefaultStyledDocument {
-		
-		
+	protected class CustomDocument extends DefaultStyledDocument {
+		public CustomDocument() {
+			super((HighlightedTextPane.this.content = new CustomContent()), new StyleContext());
+		}
+	}
+	
+	/**
+	 * A customized Content
+	 */
+	protected class CustomContent extends GapContent {
+		/**
+		 * キャレットの前のトークンを返す
+		 * @return トークン
+		 */
+		private String getTokenAtCaret() {
+			final int caretPosition = getCaretPosition();
+			char[] array = (char[]) getArray();
+			if (0 < caretPosition) {
+				int i;
+				for (i = caretPosition-1; i >= 0; i--) {
+					if (array[i] == ' ') {
+						break;
+					}
+				}
+				i = i+1;
+				System.out.println(caretPosition+", "+i);
+				return new String(array, i, (caretPosition-i));
+			}
+			return "";
+		}
 	}
 	
 	/**
 	 * A customized UndoManager
 	 */
-	protected class RuleUndoManager extends UndoManager {
+	protected class CustomUndoManager extends UndoManager {
 		private boolean nextIsMergeable = false;
 		
 		@Override

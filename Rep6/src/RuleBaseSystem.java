@@ -1,6 +1,6 @@
 import javax.swing.JFrame;
 
-import components.RuleTextPane;
+import components.HighlightedTextPane;
 
 
 public class RuleBaseSystem extends JFrame {
@@ -13,7 +13,7 @@ public class RuleBaseSystem extends JFrame {
 		setBounds(100, 100, 400, 600);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
-		RuleTextPane ruleTextPane = new RuleTextPane();
+		HighlightedTextPane ruleTextPane = new HighlightedTextPane();
 		add(ruleTextPane);
 	}
 
