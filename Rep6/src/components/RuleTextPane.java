@@ -2,10 +2,15 @@ package components;
 
 import java.awt.Color;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
+import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+
+import SuffixArray.SuffixArray;
 
 public class RuleTextPane extends HighlightedTextPane implements HighlightedTextPane.TokenHighlighter {
 	
@@ -44,6 +49,10 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		put("if", RuleAttributeSet.ifClause);
 		put("then", RuleAttributeSet.thenClause);
 	}};
+	
+	/** SuffixArray */
+	private SuffixArray suffixArray = new SuffixArray();
+	
 
 	public RuleTextPane() {
 		super();
@@ -59,7 +68,40 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		return attributeSetMap.get(token.toLowerCase());
 	}
 	
+	@Override
+	public void insertUpdate(DocumentEvent e) {
+		super.insertUpdate(e);
+		traverseRules(0); // FIXME
+		updateSuggestions();
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent e) {
+		super.removeUpdate(e);
+		traverseRules(0); // FIXME
+		updateSuggestions();
+	}
 	
+	/**
+	 * ルールのかたまりを見つけてハイライト、SuffixArray の更新を行う
+	 * @param startPos
+	 */
+	private void traverseRules(int startPos) {
+		// TODO implement this method
+	}
+
+	/**
+	 * SuffixArray を使って Suggestions を更新する
+	 */
+	private void updateSuggestions() {
+		String token = getLastEditedToken();
+		System.out.println(" --- "+token+" --- ");
+		Iterator<String> sentences = suffixArray.getSentences(token);
+		while (sentences.hasNext()) {
+			System.out.println(sentences.next());
+		}
+	}
+
 	/**
 	 * カスタマイズされた UI
 	 */

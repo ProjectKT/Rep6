@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.NoSuchElementException;
 
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -150,7 +151,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	 * 編集中のトークンのハイライトを更新する
 	 */
 	private void updateEditingTokenStyle() {
-		CharArrayTokenizer at = content.getReverseEditTokenizer();
+		CharArrayTokenizer at = getReverseEditTokenizer();
 		if (at.hasMoreElements()) {
 			String token = at.nextToken();
 			int start = at.getCurrentPosition();
@@ -163,6 +164,25 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+	
+	/**
+	 * {@linkplain CustomContent#getReverseEditTokenizer()} を返す
+	 */
+	protected CharArrayTokenizer getReverseEditTokenizer() {
+		return content.getReverseEditTokenizer();
+	}
+	
+	/**
+	 * 最後に編集したトークンを返す
+	 * @return
+	 */
+	protected String getLastEditedToken() {
+		try {
+			return getReverseEditTokenizer().nextToken();
+		} catch (NoSuchElementException e) {
+			return null;
 		}
 	}
 	
