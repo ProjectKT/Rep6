@@ -1,17 +1,18 @@
 package components;
 
 import java.awt.Color;
+import java.awt.ScrollPane;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
 
+import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import SuffixArray.OurSuffixArray;
-import SuffixArray.SuffixArray;
+import providers.OurSuffixArray;
+import providers.SuffixArray;
 
 public class RuleTextPane extends HighlightedTextPane implements HighlightedTextPane.TokenHighlighter {
 	
@@ -109,5 +110,20 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 	protected class UI extends HighlightedTextPane.UI {
 	
 	}
+	
+	public static void main(String[] args) {
+		JFrame f = new JFrame();
+		
+		f.setBounds(100, 100, 400, 600);
+		f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
 
+		RuleTextPane ruleTextPane = new RuleTextPane();
+
+		ScrollPane scrollPane = new ScrollPane();
+		scrollPane.add(ruleTextPane);
+		
+		f.add(scrollPane);
+		f.setVisible(true);
+	}
 }

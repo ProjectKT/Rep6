@@ -12,10 +12,9 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	private int newPosition;
 	private int maxPosition;
 	
-	public CharArrayTokenizer(char[] array, char[] delimiters, boolean reverse) {
+	public CharArrayTokenizer(char[] array, char[] delimiters) {
 		this.array = array;
 		this.delimiters = delimiters;
-		this.reverse = reverse;
 		currentPosition = 0;
 		newPosition = -1;
 		maxPosition = array.length;
@@ -26,8 +25,14 @@ public class CharArrayTokenizer implements Enumeration<String> {
 		return this;
 	}
 	
+	public CharArrayTokenizer reverse() {
+		reverse = !reverse;
+		newPosition = -1;
+		return this;
+	}
+	
 	public int getCurrentPosition() {
-		return reverse ? (currentPosition+1) : currentPosition;
+		return currentPosition;
 	}
 	
 	/**
@@ -119,10 +124,11 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	}
 	
 	public static void main(String[] args) {
-		char[] array = "hello world, java,hoo".toCharArray();
-		CharArrayTokenizer at = new CharArrayTokenizer(array, new char[]{' ', ','}, true).from(array.length-4);
+		char[] array = "a b c".toCharArray();
+		CharArrayTokenizer at = new CharArrayTokenizer(array, new char[]{' '}).reverse().from(4);
 		while (at.hasMoreElements()) {
-			System.out.println(at.nextToken());
+			int pos = at.getCurrentPosition();
+			System.out.println(at.nextToken()+" ("+pos+" --> "+at.getCurrentPosition()+")");
 		}
 	}
 }

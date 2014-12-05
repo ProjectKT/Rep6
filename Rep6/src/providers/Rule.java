@@ -1,4 +1,4 @@
-package SuffixArray;
+package providers;
 
 import java.util.ArrayList;
 

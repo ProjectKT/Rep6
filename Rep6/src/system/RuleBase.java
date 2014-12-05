@@ -1,12 +1,12 @@
-package ForwardChain;
-
-import SuffixArray.Rule;
+package system;
 
 import java.io.FileReader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
+import providers.Rule;
 
 	public class RuleBase {
 		String text="";

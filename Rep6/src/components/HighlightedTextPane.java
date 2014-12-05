@@ -23,9 +23,13 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Element;
 import javax.swing.text.GapContent;
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleContext;
+import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
+import javax.swing.text.DefaultStyledDocument.AttributeUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
@@ -52,6 +56,8 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	private TokenHighlighter tokenHighlighter = sDummyTokenHighlighter;
 	/** default attribute set applied to tokens  when null AttributeSet is returned from {@link HighlightedTextPane#TokenHighlighter} */
 	private AttributeSet defaultAttributeSet = new SimpleAttributeSet();
+	/** CharacterAttribute を変更している最中かどうか */
+	boolean changingCharacterAttributes = false;
 	/** キャレットの存在する行をハイライトする背景色 */
 	Color lineHighlightColor = new Color(0xfffbffbb);
 	
@@ -99,13 +105,17 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	}
 
 	@Override
-	public void insertUpdate(DocumentEvent e) { updateEditingTokenStyle(); }
+	public void insertUpdate(DocumentEvent e) { stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset()); }
 
 	@Override
-	public void removeUpdate(DocumentEvent e) { updateEditingTokenStyle(); }
+	public void removeUpdate(DocumentEvent e) { stylizeDocument(e.getOffset()-1, e.getOffset()-e.getLength()); }
 
 	@Override
-	public void changedUpdate(DocumentEvent e) { /*updateTokenStyle();*/ }
+	public void changedUpdate(DocumentEvent e) {
+		if (!changingCharacterAttributes) {
+			stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
+		}
+	}
 
 	@Override
 	public void keyTyped(KeyEvent e) { }
@@ -146,32 +156,30 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	private void updateWholeTokenStyle() {
 		// TODO implement this method
 	}
-
-	/**
-	 * 編集中のトークンのハイライトを更新する
-	 */
-	private void updateEditingTokenStyle() {
-		CharArrayTokenizer at = getReverseEditTokenizer();
-		if (at.hasMoreElements()) {
-			String token = at.nextToken();
-			int start = at.getCurrentPosition();
-			if (0 <= start) {
-				AttributeSet attr = tokenHighlighter.getAttributeSetForToken(token);
-				attr = (attr == null) ? defaultAttributeSet : attr;
-				try {
-					setCharacterAttributes(start, token.length(), attr, true);
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
 	
 	/**
-	 * {@linkplain CustomContent#getReverseEditTokenizer()} を返す
+	 * ドキュメント特定の範囲の文字列をハイライトする
+	 * @param start
+	 * @param end
 	 */
-	protected CharArrayTokenizer getReverseEditTokenizer() {
-		return content.getReverseEditTokenizer();
+	private void stylizeDocument(int start, int end) {
+		CharArrayTokenizer at = (start < end) ?
+				content.getTokenizer().from(start) :
+				content.getTokenizer().from(start).reverse();
+		final int minPosition = Math.max((start < end) ? start : end, 0);
+		final int maxPosition = Math.min((start < end) ? end+1 : start+1, getDocument().getLength());
+
+		int pos = at.getCurrentPosition();
+		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
+		while (minPosition <= pos && pos <= maxPosition && at.hasMoreElements()) {
+			String token = at.nextToken();
+			pos = at.getCurrentPosition();
+			if (-1 <= pos) {
+				AttributeSet attr = tokenHighlighter.getAttributeSetForToken(token);
+				attr = (attr == null) ? defaultAttributeSet : attr;
+				try { setCharacterAttributes(pos+1, token.length(), attr, true); } catch (InvocationTargetException e) { }
+			}
+		}
 	}
 	
 	/**
@@ -180,7 +188,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	 */
 	protected String getLastEditedToken() {
 		try {
-			return getReverseEditTokenizer().nextToken();
+			return content.getTokenizer().from(getCaretPosition()).reverse().nextToken();
 		} catch (NoSuchElementException e) {
 			return null;
 		}
@@ -190,8 +198,19 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	 * A customized Document
 	 */
 	protected class CustomDocument extends DefaultStyledDocument {
+		
 		public CustomDocument() {
 			super((HighlightedTextPane.this.content = new CustomContent()), new StyleContext());
+		}
+
+		@Override
+		public void setCharacterAttributes(int offset, int length, AttributeSet s, boolean replace) {
+			changingCharacterAttributes = true;
+			try {
+				super.setCharacterAttributes(offset, length, s, replace);
+			} finally {
+				changingCharacterAttributes = false;
+			}
 		}
 	}
 	
@@ -200,12 +219,11 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	 */
 	protected class CustomContent extends GapContent {
 		/**
-		 * 編集中の(キャレットの位置の)トークンが初期位置になった逆方向への CharArrayTokenizer を返す
+		 * CharArrayTokenizer を返す
 		 * @return
 		 */
-		public CharArrayTokenizer getReverseEditTokenizer() {
-			final int caretPosition = getCaretPosition();
-			return new CharArrayTokenizer((char[]) getArray(), delimiters, true).from(caretPosition-1);
+		public CharArrayTokenizer getTokenizer() {
+			return new CharArrayTokenizer((char[]) getArray(), delimiters);
 		}
 	}
 	

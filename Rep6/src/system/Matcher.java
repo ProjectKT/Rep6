@@ -1,4 +1,4 @@
-package ForwardChain;
+package system;
 
 import java.util.HashMap;
 import java.util.StringTokenizer;

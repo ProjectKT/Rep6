@@ -1,7 +1,5 @@
 package gui;
 
-import ForwardChain.RuleBase;
-
 import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -10,7 +8,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import SuffixArray.*;
+import providers.*;
+import system.RuleBase;
 import components.*;
 
 import java.awt.BorderLayout;
