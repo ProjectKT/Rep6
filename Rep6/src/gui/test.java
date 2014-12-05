@@ -3,14 +3,17 @@ package gui;
 import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import SuffixArray.*;
 import components.*;
 
 import java.awt.BorderLayout;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -42,19 +45,35 @@ public class test extends JFrame{
     JPanel tabPanel2 = new JPanel();
     String text="";
     
-	RuleTextPane ruleTextPane = new RuleTextPane();
+	
     for(int i =0; i<rules.size();i++ ){
-    	text = text + rules.get(i).toString()+"\n";
+    	text = text + rules.get(i).toString2()+"\n";
     	System.out.println(text);
     }
     
 
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder builder = factory.newDocumentBuilder();
+    DocumentBuilder builder = null;
+    Document doc;
+	try {
+		builder = factory.newDocumentBuilder();
+	} catch (ParserConfigurationException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     ByteArrayInputStream stream = new ByteArrayInputStream(text.getBytes());
-    Document doc = builder.parse(stream);
+    try {
+		doc = builder.parse(stream);
+	} catch (SAXException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 
-    
+    RuleTextPane ruleTextPane = new RuleTextPane();
+    ruleTextPane.setToolTipText(text);
 
     JPanel tabPanel3 = new JPanel();
     tabPanel3.add(new JButton("button2"));

@@ -35,7 +35,19 @@ public class Rule {
 	public String toString() {
 		return name + " " + antecedents.toString() + "->" + consequent;
 	}
-
+	
+	/**
+	 * ルールの表示用にdataに入っているのと同じようにルールを表示する
+	 */
+	public String toString2(){
+		String text = "rule	\""+name + "\"\nif";
+		for(int i =0;i<antecedents.size();i++){
+			text += "	\""+antecedents.get(i)+"\"\n";
+		}
+		text +="then	\""+consequent+"\"\n";
+		return text;
+	}
+	
 	/**
 	 * ルールの前件を返す．
 	 * 
