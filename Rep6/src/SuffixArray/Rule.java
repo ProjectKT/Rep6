@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * 
  * 
  */
-class Rule {
+public class Rule {
 	String name;
 	ArrayList<String> antecedents;
 	String consequent;

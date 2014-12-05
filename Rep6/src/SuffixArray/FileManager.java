@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
 
-class FileManager {
+public class FileManager {
 	FileReader f;
 	StreamTokenizer st;
 

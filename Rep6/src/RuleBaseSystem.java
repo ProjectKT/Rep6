@@ -1,3 +1,5 @@
+
+
 import javax.swing.JFrame;
 
 import components.RuleTextPane;

@@ -10,6 +10,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import SuffixArray.OurSuffixArray;
 import SuffixArray.SuffixArray;
 
 public class RuleTextPane extends HighlightedTextPane implements HighlightedTextPane.TokenHighlighter {
@@ -51,7 +52,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 	}};
 	
 	/** SuffixArray */
-	private SuffixArray suffixArray = new SuffixArray();
+	private SuffixArray suffixArray = new OurSuffixArray();
 	
 
 	public RuleTextPane() {
