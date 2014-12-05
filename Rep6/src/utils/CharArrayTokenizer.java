@@ -25,6 +25,11 @@ public class CharArrayTokenizer implements Enumeration<String> {
 		return this;
 	}
 	
+	public CharArrayTokenizer limit(int maxPosition) {
+		this.maxPosition = maxPosition;
+		return this;
+	}
+	
 	public CharArrayTokenizer reverse() {
 		reverse = !reverse;
 		newPosition = -1;
