@@ -12,7 +12,7 @@ public class Rule {
 	ArrayList<String> antecedents;
 	String consequent;
 
-	Rule(String theName, ArrayList<String> theAntecedents, String theConsequent) {
+	public Rule(String theName, ArrayList<String> theAntecedents, String theConsequent) {
 		this.name = theName;
 		this.antecedents = theAntecedents;
 		this.consequent = theConsequent;

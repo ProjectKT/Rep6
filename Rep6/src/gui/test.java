@@ -1,5 +1,7 @@
 package gui;
 
+import ForwardChain.RuleBase;
+
 import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -12,18 +14,22 @@ import SuffixArray.*;
 import components.*;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class test extends JFrame{
+public class test extends JFrame implements ActionListener {
 	OurSuffixArray osa = new OurSuffixArray();
 	static FileManager fm;
 	ArrayList<Rule> rules = new ArrayList<Rule>();
 	ArrayList<String> wm = new ArrayList<String>();
 	private static final String[] RULE_FILES = {"AnimalWorld.data","CarShop.data"};
 	private static final String[] WM_FILES = {"AnimalWorldWm.data","CarShopWm.data"};
+	JTextArea area3;
 	
   public static void main(String[] args){
     test frame = new test();
@@ -75,13 +81,26 @@ public class test extends JFrame{
     RuleTextPane ruleTextPane = new RuleTextPane();
     ruleTextPane.setToolTipText(text);
 
+    area3 = new JTextArea();
     JPanel tabPanel3 = new JPanel();
-    tabPanel3.add(new JButton("button2"));
+    JButton b1 =new JButton("button2");
+
+    JScrollPane scrollPane = new JScrollPane(area3);
+	scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+	scrollPane.setPreferredSize(new Dimension(200, 100));
+	getContentPane().add(scrollPane, BorderLayout.CENTER);
+    
+    
+    b1.addActionListener(this);
+	getContentPane().add(b1);
+    tabPanel3.add(b1);
+    tabPanel3.add(scrollPane);  
 
     tabbedpane.addTab("main", tabPanel1);
     tabbedpane.addTab("変更", ruleTextPane);
     tabbedpane.addTab("質問", tabPanel3);
 
+    
     tabbedpane.setTabPlacement(JTabbedPane.TOP);
 
     getContentPane().add(tabbedpane, BorderLayout.CENTER);
@@ -107,4 +126,14 @@ public class test extends JFrame{
 			osa.addSuffixWm(wm.get(i2));
 		}
 	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		System.out.println("OK");
+		RuleBase rb = new RuleBase();
+		rb.forwardChain();
+		area3.setText(rb.get_answer());
+	}
+
+
 }
