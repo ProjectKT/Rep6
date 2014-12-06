@@ -26,6 +26,7 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Element;
 import javax.swing.text.GapContent;
 import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.Segment;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleContext;
 import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
@@ -105,15 +106,31 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	}
 
 	@Override
-	public void insertUpdate(DocumentEvent e) { stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset()); }
+	public void insertUpdate(DocumentEvent e) {
+		try {
+			stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
+		} catch (BadLocationException e1) {
+			e1.printStackTrace();
+		}
+	}
 
 	@Override
-	public void removeUpdate(DocumentEvent e) { stylizeDocument(e.getOffset()-1, e.getOffset()-e.getLength()); }
+	public void removeUpdate(DocumentEvent e) {
+		try {
+			stylizeDocument(e.getOffset()-1, e.getOffset()-e.getLength());
+		} catch (BadLocationException e1) {
+			e1.printStackTrace();
+		}
+	}
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
 		if (!changingCharacterAttributes) {
-			stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
+			try {
+				stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
+			} catch (BadLocationException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 
@@ -161,20 +178,37 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	 * ドキュメント特定の範囲の文字列をハイライトする
 	 * @param start
 	 * @param end
+	 * @throws BadLocationException 
 	 */
-	private void stylizeDocument(int start, int end) {
+	private void stylizeDocument(int start, int end) throws BadLocationException {
+		// start, end の位置をデリミタまで拡大
+		//  aaa bbb ccc       aaa bbb ccc
+		//   A   A           A       A
+		//   |   |      -->  |       |
+		//   |  end          |      end
+		// start           start
+		System.out.println("stylizeDocument("+start+", "+end+")");
+		
 		CharArrayTokenizer at = (start < end) ?
-				content.getTokenizer().from(start) :
-				content.getTokenizer().from(start).reverse();
-		final int minPosition = Math.max((start < end) ? start : end, 0);
-		final int maxPosition = Math.min((start < end) ? end+1 : start+1, getDocument().getLength());
+				content.getTokenizer().from(start).reverse():
+				content.getTokenizer().from(start);
+		if (at.hasMoreElements()) {
+			// 一つ前のデリミタまで戻す
+			at.nextToken();
+			start = at.getCurrentPosition();
+		}
+		at = at.reverse();
+		final int minPosition = Math.max((start < end) ? start : end, -1);
+		final int maxPosition = Math.min((start < end) ? end+1 : start+1, getDocument().getLength()+1);
 
 		int pos = at.getCurrentPosition();
 		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
+		System.out.println(" --> "+(minPosition <= pos)+", "+(pos <= maxPosition));
 		while (minPosition <= pos && pos <= maxPosition && at.hasMoreElements()) {
 			String token = at.nextToken();
 			pos = at.getCurrentPosition();
 			if (-1 <= pos) {
+				System.out.println(" token: "+token+" ("+(pos+1)+" --> "+(pos+token.length())+")");
 				AttributeSet attr = tokenHighlighter.getAttributeSetForToken(token);
 				attr = (attr == null) ? defaultAttributeSet : attr;
 				try { setCharacterAttributes(pos+1, token.length(), attr, true); } catch (InvocationTargetException e) { }
@@ -189,7 +223,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	protected String getLastEditedToken() {
 		try {
 			return content.getTokenizer().from(getCaretPosition()).reverse().nextToken();
-		} catch (NoSuchElementException e) {
+		} catch (NoSuchElementException | BadLocationException e) {
 			return null;
 		}
 	}
@@ -221,9 +255,16 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		/**
 		 * CharArrayTokenizer を返す
 		 * @return
+		 * @throws BadLocationException 
 		 */
-		public CharArrayTokenizer getTokenizer() {
-			return new CharArrayTokenizer((char[]) getArray(), delimiters);
+		public CharArrayTokenizer getTokenizer() throws BadLocationException {
+			Segment chars = new Segment();
+//			chars.setPartialReturn(true);
+			getChars(0, length(), chars);
+			System.out.println("getTokenizer(): (len="+length()+"), "+chars+", offset="+chars.offset+", count="+chars.count);
+			return new CharArrayTokenizer(chars.array, delimiters)
+						.offset(chars.offset)
+						.limit(chars.count-1);
 		}
 	}
 	

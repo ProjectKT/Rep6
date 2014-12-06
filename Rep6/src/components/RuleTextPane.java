@@ -70,19 +70,19 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		return attributeSetMap.get(token.toLowerCase());
 	}
 	
-	@Override
-	public void insertUpdate(DocumentEvent e) {
-		super.insertUpdate(e);
-		traverseRules(0); // FIXME
-		updateSuggestions();
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent e) {
-		super.removeUpdate(e);
-		traverseRules(0); // FIXME
-		updateSuggestions();
-	}
+//	@Override
+//	public void insertUpdate(DocumentEvent e) {
+//		super.insertUpdate(e);
+//		traverseRules(0); // FIXME
+//		updateSuggestions();
+//	}
+//
+//	@Override
+//	public void removeUpdate(DocumentEvent e) {
+//		super.removeUpdate(e);
+//		traverseRules(0); // FIXME
+//		updateSuggestions();
+//	}
 	
 	/**
 	 * ルールのかたまりを見つけてハイライト、SuffixArray の更新を行う

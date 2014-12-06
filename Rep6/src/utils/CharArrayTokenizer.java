@@ -11,6 +11,7 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	private int currentPosition;
 	private int newPosition;
 	private int maxPosition;
+	private int offset;
 	
 	public CharArrayTokenizer(char[] array, char[] delimiters) {
 		this.array = array;
@@ -18,22 +19,31 @@ public class CharArrayTokenizer implements Enumeration<String> {
 		currentPosition = 0;
 		newPosition = -1;
 		maxPosition = array.length;
+		offset = 0;
 	}
 	
-	public CharArrayTokenizer from(int position) {
-		this.currentPosition = position;
+	public CharArrayTokenizer offset(int offset) {
+		currentPosition -= this.offset;
+		this.offset = Math.max(0, offset);
+		currentPosition += this.offset;
+		newPosition = -1;
 		return this;
 	}
 	
-	public CharArrayTokenizer limit(int maxPosition) {
-		this.maxPosition = maxPosition;
+	public CharArrayTokenizer from(int position) {
+		this.currentPosition = Math.min(Math.max(offset, offset+position), maxPosition);
+		return this;
+	}
+	
+	public CharArrayTokenizer limit(int length) {
+		this.maxPosition = Math.min(offset+length, array.length);
 		return this;
 	}
 	
 	public CharArrayTokenizer reverse() {
 		reverse = !reverse;
 		newPosition = -1;
-		return this;
+		return from(reverse ? currentPosition+1 : currentPosition-1);
 	}
 	
 	public int getCurrentPosition() {
@@ -49,7 +59,7 @@ public class CharArrayTokenizer implements Enumeration<String> {
 			newPosition = skipDelimiters(currentPosition);
 		}
 		
-		return reverse ? (0 <= newPosition) : (newPosition < maxPosition);
+		return reverse ? (offset <= newPosition) : (newPosition < maxPosition);
 	}
 
 	/**
@@ -66,10 +76,10 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	 * @throws NoSuchElementException
 	 */
 	public String nextToken() throws NoSuchElementException {
-		currentPosition = (0 <= newPosition) ? newPosition : skipDelimiters(currentPosition);
+		currentPosition = (offset <= newPosition) ? newPosition : skipDelimiters(currentPosition);
 		newPosition = -1;
 		
-		if ((reverse && currentPosition <= -1) || (!reverse && maxPosition <= currentPosition)) {
+		if ((reverse && currentPosition < offset) || (!reverse && maxPosition <= currentPosition)) {
 			throw new NoSuchElementException();
 		}
 		
@@ -89,7 +99,7 @@ public class CharArrayTokenizer implements Enumeration<String> {
 				position++;
 			}
 		} else {
-			while (-1 < position) {
+			while (offset <= position) {
 				if (!isDelimiter(array[position])) {
 					break;
 				}
@@ -109,7 +119,7 @@ public class CharArrayTokenizer implements Enumeration<String> {
 				position++;
 			}
 		} else {
-			while (-1 < position) {
+			while (offset <= position) {
 				if (isDelimiter(array[position])) {
 					break;
 				}
@@ -129,8 +139,10 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	}
 	
 	public static void main(String[] args) {
-		char[] array = "a b c".toCharArray();
-		CharArrayTokenizer at = new CharArrayTokenizer(array, new char[]{' '}).reverse().from(4);
+		char[] array = "a rule".toCharArray();
+		CharArrayTokenizer at = new CharArrayTokenizer(array, new char[]{' '}).offset(0).limit(4).from(1).reverse();
+		if (at.hasMoreElements()) { at.nextElement(); }
+		at = at.reverse();
 		while (at.hasMoreElements()) {
 			int pos = at.getCurrentPosition();
 			System.out.println(at.nextToken()+" ("+pos+" --> "+at.getCurrentPosition()+")");
