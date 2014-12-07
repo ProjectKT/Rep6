@@ -52,7 +52,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	
 	/** UndoManager */
 	private final CustomUndoManager undoManager = new CustomUndoManager();
-	private CustomContent content;
+	private CustomDocument document;
 	private char[] delimiters = new char[]{' ','\n','\r','\t','\f'};
 	private TokenHighlighter tokenHighlighter = sDummyTokenHighlighter;
 	/** default attribute set applied to tokens  when null AttributeSet is returned from {@link HighlightedTextPane#TokenHighlighter} */
@@ -72,7 +72,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	};
 	
 	public HighlightedTextPane() {
-		CustomDocument document = new CustomDocument();
+		document = new CustomDocument();
 		document.addDocumentListener(this);
 		document.addUndoableEditListener(undoableEditListener);
 		setDocument(document);
@@ -107,6 +107,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 
 	@Override
 	public void insertUpdate(DocumentEvent e) {
+		System.out.println("insertUpdate(): offset="+e.getOffset()+", length="+e.getLength());
 		try {
 			stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
 		} catch (BadLocationException e1) {
@@ -116,8 +117,9 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {
+		System.out.println("removeUpdate(): offset="+e.getOffset()+", length="+e.getLength());
 		try {
-			stylizeDocument(e.getOffset()-1, e.getOffset()-e.getLength());
+			stylizeDocument(e.getOffset()-e.getLength(), e.getOffset()-e.getLength()+1);
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
@@ -126,6 +128,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
 		if (!changingCharacterAttributes) {
+			System.out.println("changedUpdate(): offset="+e.getOffset()+", length="+e.getLength());
 			try {
 				stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
 			} catch (BadLocationException e1) {
@@ -162,7 +165,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				getStyledDocument().setCharacterAttributes(offset, length, s, replace);
+				document.setCharacterAttributes(offset, length, s, replace);
 			}
 		});
 	}
@@ -190,28 +193,32 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		System.out.println("stylizeDocument("+start+", "+end+")");
 		
 		CharArrayTokenizer at = (start < end) ?
-				content.getTokenizer().from(start).reverse():
-				content.getTokenizer().from(start);
+				document.getTokenizer().from(start).reverse():
+				document.getTokenizer().from(start);
 		if (at.hasMoreElements()) {
 			// 一つ前のデリミタまで戻す
 			at.nextToken();
 			start = at.getCurrentPosition();
 		}
 		at = at.reverse();
-		final int minPosition = Math.max((start < end) ? start : end, -1);
-		final int maxPosition = Math.min((start < end) ? end+1 : start+1, getDocument().getLength()+1);
+		final int minPosition = Math.max((start < end) ? start : end, 0);
+		final int maxPosition = Math.min((start < end) ? end : start, document.getLength());
 
 		int pos = at.getCurrentPosition();
 		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
-		System.out.println(" --> "+(minPosition <= pos)+", "+(pos <= maxPosition));
-		while (minPosition <= pos && pos <= maxPosition && at.hasMoreElements()) {
+		while (minPosition <= pos && pos < maxPosition && at.hasMoreElements()) {
 			String token = at.nextToken();
 			pos = at.getCurrentPosition();
 			if (-1 <= pos) {
-				System.out.println(" token: "+token+" ("+(pos+1)+" --> "+(pos+token.length())+")");
 				AttributeSet attr = tokenHighlighter.getAttributeSetForToken(token);
 				attr = (attr == null) ? defaultAttributeSet : attr;
-				try { setCharacterAttributes(pos+1, token.length(), attr, true); } catch (InvocationTargetException e) { }
+				if (start < end) {
+					System.out.println(" token: "+token+" ("+(pos-token.length())+" --> "+(pos)+")");
+					try { setCharacterAttributes(pos-token.length(), token.length(), attr, true); } catch (InvocationTargetException e) { }
+				} else {
+					System.out.println(" token: "+token+" ("+(pos+1)+" --> "+(pos+token.length())+")");
+					try { setCharacterAttributes(pos+1, token.length(), attr, true); } catch (InvocationTargetException e) { }
+				}
 			}
 		}
 	}
@@ -222,7 +229,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	 */
 	protected String getLastEditedToken() {
 		try {
-			return content.getTokenizer().from(getCaretPosition()).reverse().nextToken();
+			return document.getTokenizer().from(getCaretPosition()).reverse().nextToken();
 		} catch (NoSuchElementException | BadLocationException e) {
 			return null;
 		}
@@ -233,10 +240,6 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	 */
 	protected class CustomDocument extends DefaultStyledDocument {
 		
-		public CustomDocument() {
-			super((HighlightedTextPane.this.content = new CustomContent()), new StyleContext());
-		}
-
 		@Override
 		public void setCharacterAttributes(int offset, int length, AttributeSet s, boolean replace) {
 			changingCharacterAttributes = true;
@@ -246,25 +249,19 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 				changingCharacterAttributes = false;
 			}
 		}
-	}
-	
-	/**
-	 * A customized Content
-	 */
-	protected class CustomContent extends GapContent {
+		
 		/**
 		 * CharArrayTokenizer を返す
 		 * @return
 		 * @throws BadLocationException 
 		 */
 		public CharArrayTokenizer getTokenizer() throws BadLocationException {
-			Segment chars = new Segment();
-//			chars.setPartialReturn(true);
-			getChars(0, length(), chars);
-			System.out.println("getTokenizer(): (len="+length()+"), "+chars+", offset="+chars.offset+", count="+chars.count);
-			return new CharArrayTokenizer(chars.array, delimiters)
-						.offset(chars.offset)
-						.limit(chars.count-1);
+			Segment txt = new Segment();
+			getText(0, getLength(), txt);
+			System.out.println("getTokenizer(): (len="+getLength()+"), "+txt+", offset="+txt.offset+", count="+txt.count);
+			return new CharArrayTokenizer(txt.array, delimiters)
+						.offset(txt.offset)
+						.limit(txt.count);
 		}
 	}
 	

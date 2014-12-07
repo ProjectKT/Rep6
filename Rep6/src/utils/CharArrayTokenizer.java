@@ -3,6 +3,7 @@ package utils;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
 public class CharArrayTokenizer implements Enumeration<String> {
 	private char[] array;
@@ -43,11 +44,11 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	public CharArrayTokenizer reverse() {
 		reverse = !reverse;
 		newPosition = -1;
-		return from(reverse ? currentPosition+1 : currentPosition-1);
+		return from(reverse ? currentPosition-1 : currentPosition+1);
 	}
 	
 	public int getCurrentPosition() {
-		return currentPosition;
+		return currentPosition - offset;
 	}
 	
 	/**
@@ -55,11 +56,15 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	 */
 	@Override
 	public boolean hasMoreElements() {
+		return hasMoreTokens();
+	}
+	
+	public boolean hasMoreTokens() {
 		if (newPosition == -1) {
 			newPosition = skipDelimiters(currentPosition);
 		}
 		
-		return reverse ? (offset <= newPosition) : (newPosition < maxPosition);
+		return (offset <= newPosition && newPosition < maxPosition);
 	}
 
 	/**
@@ -76,7 +81,7 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	 * @throws NoSuchElementException
 	 */
 	public String nextToken() throws NoSuchElementException {
-		currentPosition = (offset <= newPosition) ? newPosition : skipDelimiters(currentPosition);
+		currentPosition = (offset <= newPosition && newPosition < maxPosition) ? newPosition : skipDelimiters(currentPosition);
 		newPosition = -1;
 		
 		if ((reverse && currentPosition < offset) || (!reverse && maxPosition <= currentPosition)) {
@@ -85,45 +90,33 @@ public class CharArrayTokenizer implements Enumeration<String> {
 		
 		int start = currentPosition;
 		int end = scanToken(currentPosition);
+		System.out.println("nextToken(): start="+start+", end="+end+", offset="+offset+", max="+maxPosition);
 		currentPosition = end;
 		return new String(reverse ? Arrays.copyOfRange(array, end+1, start+1) : Arrays.copyOfRange(array, start, end));
 	}
 	
 	private int skipDelimiters(int startPos) {
 		int position = startPos;
-		if (!reverse) {
-			while (position < maxPosition) {
-				if (!isDelimiter(array[position])) {
-					break;
-				}
-				position++;
+		while (offset <= position && position < maxPosition) {
+			if (!isDelimiter(array[position])) {
+				break;
 			}
-		} else {
-			while (offset <= position) {
-				if (!isDelimiter(array[position])) {
-					break;
-				}
-				position--;
-			}
+			position = reverse ? position-1 : position+1;
 		}
 		return position;
 	}
 	
 	private int scanToken(int startPos) {
 		int position = startPos;
-		if (!reverse) {
-			while (position < maxPosition) {
-				if (isDelimiter(array[position])) {
-					break;
-				}
-				position++;
+		while (offset <= position && position < maxPosition) {
+			if (isDelimiter(array[position])) {
+				break;
 			}
-		} else {
-			while (offset <= position) {
-				if (isDelimiter(array[position])) {
-					break;
-				}
-				position--;
+			position = reverse ? position-1 : position+1;
+		}
+		if (startPos == position) {
+			if (isDelimiter(array[position])) {
+				position = reverse ? position-1 : position+1;
 			}
 		}
 		return position;
@@ -140,12 +133,18 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	
 	public static void main(String[] args) {
 		char[] array = "a rule".toCharArray();
-		CharArrayTokenizer at = new CharArrayTokenizer(array, new char[]{' '}).offset(0).limit(4).from(1).reverse();
-		if (at.hasMoreElements()) { at.nextElement(); }
+		CharArrayTokenizer at = new CharArrayTokenizer(array, new char[]{' '}).offset(3).from(0).reverse();
+		if (at.hasMoreElements()) { System.out.println(at.nextElement()); }
 		at = at.reverse();
 		while (at.hasMoreElements()) {
 			int pos = at.getCurrentPosition();
 			System.out.println(at.nextToken()+" ("+pos+" --> "+at.getCurrentPosition()+")");
+		}
+		
+		String s = "";
+		StringTokenizer st = new StringTokenizer(s);
+		while (st.hasMoreElements()) {
+			System.out.println(st.nextToken());
 		}
 	}
 }
