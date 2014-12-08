@@ -1,14 +1,20 @@
 package gui;
 
 import java.awt.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
 
-public class gui extends JFrame{
+import java.awt.event.*;
 
+public class gui extends JFrame implements ActionListener{
+
+	String data="data";
+	
 	// コンストラクタ
 	public gui() {
 		initialize();
-		JTabbedPane
+		set();
 		setVisible(true);
 	}
 	
@@ -18,27 +24,51 @@ public class gui extends JFrame{
 		setBounds(10,10,1000,800);
 		setTitle("gui");
 	}
+
+	private void set(){
+		
+
+		JTabbedPane tabbedPane = new JTabbedPane();
+
+		JPanel tab1 = new JPanel();//質問ページ
+
+		tabbedPane.addTab("質問",tab1);
+//		getContentPane().setLayout(new GridLayout(2,2));
+		JTextField tf = new JTextField("",20);
+		getContentPane().add(tf);
+		tab1.add(tf);
+		
+		JButton b1 = new JButton("OK");
+		b1.addActionListener(this);
+		getContentPane().add(b1);
+		tab1.add(b1);
+
+		JButton b2 = new JButton("OK");
+		b2.addActionListener(this);
+		getContentPane().add(b2);
+		tab1.add(b2);
+		
+		
+		JPanel tab2 = new JPanel();//編集ページ
+		tabbedPane.addTab("編集",tab2);
+
+		getContentPane().add(tabbedPane,BorderLayout.CENTER);
+
+		
+	}
 	
-	JTabbedPaneTest2(){
-	    JTabbedPane tabbedpane = new JTabbedPane();
-
-	    JPanel tabPanel1 = new JPanel();
-	    tabPanel1.add(new JButton("button1"));
-
-	    JPanel tabPanel2 = new JPanel();
-	    tabPanel2.add(new JLabel("Name:"));
-	    tabPanel2.add(new JTextField("", 10));
-
-	    tabbedpane.addTab("tab1", tabPanel1);
-	    tabbedpane.addTab("tab2", tabPanel2);
-
-	    getContentPane().add(tabbedpane, BorderLayout.CENTER);
-	  }
+	
 	
 	public static void main(String[] args) {
 		//
 		
 		gui gui = new gui();
 		gui.setVisible(true);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
