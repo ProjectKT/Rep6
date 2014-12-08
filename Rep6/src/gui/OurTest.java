@@ -1,11 +1,14 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
+import javax.swing.text.StyleContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import providers.*;
@@ -57,28 +60,16 @@ public class OurTest extends JFrame implements ActionListener {
     }
     
 
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder builder = null;
-    Document doc;
-	try {
-		builder = factory.newDocumentBuilder();
-	} catch (ParserConfigurationException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-    ByteArrayInputStream stream = new ByteArrayInputStream(text.getBytes());
+    StyleContext sc = new StyleContext();
+    DefaultStyledDocument doc = new DefaultStyledDocument(sc);
     try {
-		doc = builder.parse(stream);
-	} catch (SAXException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (IOException e) {
+		doc.insertString(0, text, sc.getStyle(StyleContext.DEFAULT_STYLE));
+	} catch (BadLocationException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-
     RuleTextPane ruleTextPane = new RuleTextPane();
-    ruleTextPane.setToolTipText(text);
+    ruleTextPane.setDocument(doc);
 
     area3 = new JTextArea();
     JPanel tabPanel3 = new JPanel();
