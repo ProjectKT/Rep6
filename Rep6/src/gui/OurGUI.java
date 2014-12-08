@@ -5,11 +5,11 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -21,16 +21,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
+
 import components.RuleTextPane;
 
 public class OurGUI extends JFrame implements ActionListener {
@@ -50,7 +45,29 @@ public class OurGUI extends JFrame implements ActionListener {
 	JMenuItem mntmOpenRuleFile;
 	JMenuItem mntmOpenWMFile;
 	JMenuItem mntmExit;
-    RuleTextPane ruleTextPane = new RuleTextPane();
+    RuleTextPane ruleTextPane;
+    
+    /**
+     * RuleTextPane のコールバック
+     */
+    private RuleTextPane.Callbacks ruleTextPaneCallbacks = new RuleTextPane.Callbacks() {
+		@Override
+		public void onRuleRemoved(Rule rule) {
+			osa.addSuffixRule(rule);
+		}
+		
+		@Override
+		public void onRuleCreated(Rule rule) {
+			osa.deleteSuffixRule(rule.getName());
+		}
+		
+		@Override
+		public List<String> getSuggestions(String input) {
+//			return osa.getAllSentences(input); // FIXME 本当は Iterator よりも List そのものを返してくれた方が嬉しい。まあどっちでもいいけど
+			return null;
+		}
+	};
+    
     
 	// コンストラクタ
 	public OurGUI() {
@@ -59,31 +76,32 @@ public class OurGUI extends JFrame implements ActionListener {
 		loadData();
 		setupSuffixArray();
 		
-		for(int i =0; i<rules.size();i++ )
-	    	text = text + rules.get(i).toString2()+"\n";
-		
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder builder = null;
-	    Document doc;
-		try {
-			builder = factory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    ByteArrayInputStream stream = new ByteArrayInputStream(text.getBytes());
-	    try {
-			doc = builder.parse(stream);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-	    ruleTextPane.setToolTipText(text);
+		// 2014-12-08 h.m. loadRuleFile() に移行
+//		for(int i =0; i<rules.size();i++ )
+//	    	text = text + rules.get(i).toString2()+"\n";
+//		
+//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//	    DocumentBuilder builder = null;
+//	    Document doc;
+//		try {
+//			builder = factory.newDocumentBuilder();
+//		} catch (ParserConfigurationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	    ByteArrayInputStream stream = new ByteArrayInputStream(text.getBytes());
+//	    try {
+//			doc = builder.parse(stream);
+//		} catch (SAXException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//
+//	    ruleTextPane.setToolTipText(text);
 		
 		set();
 		setVisible(true);
@@ -142,6 +160,8 @@ public class OurGUI extends JFrame implements ActionListener {
 		
 		
 		JPanel tab2 = new JPanel();//編集ページ
+		ruleTextPane = new RuleTextPane();
+		ruleTextPane.setCallbacks(ruleTextPaneCallbacks);
 		JScrollPane sp = new JScrollPane(ruleTextPane);
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		sp.setPreferredSize(new Dimension(900, 700));

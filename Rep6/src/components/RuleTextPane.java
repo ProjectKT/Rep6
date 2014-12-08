@@ -3,6 +3,7 @@ package components;
 import java.awt.Color;
 import java.awt.ScrollPane;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
@@ -22,7 +23,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		/** ルールが削除された時に呼ばれる */
 		public void onRuleRemoved(Rule rule);
 		/** SuffixArray から Suggestion を取得するときに呼ばれる */
-		public void getSuggestions(String input);
+		public List<String> getSuggestions(String input);
 	}
 	
 	protected static final Callbacks sDummyCallbacks = new Callbacks() {
@@ -31,7 +32,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		@Override
 		public void onRuleRemoved(Rule rule) { }
 		@Override
-		public void getSuggestions(String input) { }
+		public List<String> getSuggestions(String input) { return null; }
 	};
 	
 	/** コールバック */
