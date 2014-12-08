@@ -59,6 +59,10 @@ public class SuffixData {
 		if(rule != null)
 		rules.put(rule.getName(),rule);
 	}
+	
+	void removeRule(Rule rule){
+		rules.remove(rule.getName());
+	}
 
 	Iterator<String> getWords() {
 		return words.iterator();
