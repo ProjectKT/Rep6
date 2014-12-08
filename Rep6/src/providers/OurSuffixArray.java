@@ -40,7 +40,7 @@ public class OurSuffixArray extends SuffixArray{
 	public static void main(String[] args) {
 		OurSuffixArray osa = new OurSuffixArray();
 		
-		Iterator it = osa.getSentences("has");
+		Iterator it = osa.getAllSentences("has");
 		while(it.hasNext()){
 			System.out.println(it.next());
 		}

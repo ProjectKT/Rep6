@@ -7,12 +7,12 @@ import javax.swing.event.*;
 
 import java.awt.event.*;
 
-public class gui extends JFrame implements ActionListener{
+public class OurGUI extends JFrame implements ActionListener{
 
 	String data="data";
 	
 	// コンストラクタ
-	public gui() {
+	public OurGUI() {
 		initialize();
 		set();
 		setVisible(true);
@@ -62,7 +62,7 @@ public class gui extends JFrame implements ActionListener{
 	public static void main(String[] args) {
 		//
 		
-		gui gui = new gui();
+		OurGUI gui = new OurGUI();
 		gui.setVisible(true);
 	}
 
@@ -72,3 +72,4 @@ public class gui extends JFrame implements ActionListener{
 		
 	}
 }
+

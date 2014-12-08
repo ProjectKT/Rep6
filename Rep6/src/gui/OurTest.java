@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class test extends JFrame implements ActionListener {
+public class OurTest extends JFrame implements ActionListener {
 	OurSuffixArray osa = new OurSuffixArray();
 	static FileManager fm;
 	ArrayList<Rule> rules = new ArrayList<Rule>();
@@ -29,24 +29,23 @@ public class test extends JFrame implements ActionListener {
 	private static final String[] RULE_FILES = {"AnimalWorld.data","CarShop.data"};
 	private static final String[] WM_FILES = {"AnimalWorldWm.data","CarShopWm.data"};
 	JTextArea area3;
-	JTextArea area1;
 	
   public static void main(String[] args){
-    test frame = new test();
+    OurTest frame = new OurTest();
 
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setBounds(10, 10, 600, 400);
+    frame.setBounds(10, 10, 300, 200);
     frame.setTitle("タイトル");
     frame.setVisible(true);
   }
 
-  test(){
+  OurTest(){
 	  loadData();
 		setupSuffixArray();
     JTabbedPane tabbedpane = new JTabbedPane();
 
     JPanel tabPanel1 = new JPanel();
-    tabPanel1.add(new JButton("更新"));
+    tabPanel1.add(new JButton("button1"));
 
     JPanel tabPanel2 = new JPanel();
     String text="";
@@ -85,20 +84,18 @@ public class test extends JFrame implements ActionListener {
     JPanel tabPanel3 = new JPanel();
     JButton b1 =new JButton("button2");
 
-    JScrollPane scrollPane3 = new JScrollPane(area3);
-	scrollPane3.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	scrollPane3.setPreferredSize(new Dimension(200, 100));
-	getContentPane().add(scrollPane3, BorderLayout.CENTER);
+    JScrollPane scrollPane = new JScrollPane(area3);
+	scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+	scrollPane.setPreferredSize(new Dimension(200, 100));
+	getContentPane().add(scrollPane, BorderLayout.CENTER);
     
     
     b1.addActionListener(this);
 	getContentPane().add(b1);
     tabPanel3.add(b1);
-    tabPanel3.add(scrollPane3);  
-    
-    
-    
-    tabbedpane.addTab("ルール", tabPanel1);
+    tabPanel3.add(scrollPane);  
+
+    tabbedpane.addTab("main", tabPanel1);
     tabbedpane.addTab("変更", ruleTextPane);
     tabbedpane.addTab("質問", tabPanel3);
 
