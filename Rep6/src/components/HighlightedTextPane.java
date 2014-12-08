@@ -81,6 +81,19 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		initialize(doc);
 	}
 	
+	public HighlightedTextPane(String text) {
+		super();
+		 StyleContext sc = new StyleContext();
+		 CustomDocument doc = new CustomDocument();
+		    try {
+				doc.insertString(0, text, sc.getStyle(StyleContext.DEFAULT_STYLE));
+			} catch (BadLocationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		initialize(doc);
+	}
+	
 	private void initialize(CustomDocument doc) {
 		document = doc;
 		document.addDocumentListener(this);
@@ -89,6 +102,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		addKeyListener(this);
 		setUI(new HighlightedTextPane.UI());
 	}
+	
 	
 	/**
 	 * TokenHighlighter を設定する

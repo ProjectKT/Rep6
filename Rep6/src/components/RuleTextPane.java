@@ -8,9 +8,13 @@ import java.util.Iterator;
 import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
+import components.HighlightedTextPane.CustomDocument;
 import providers.OurSuffixArray;
 import providers.SuffixArray;
 import system.RuleCompiler;
@@ -60,6 +64,12 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 
 	public RuleTextPane() {
 		super();
+		setTokenHighlighter(this);
+		setUI(new RuleTextPane.UI());
+	}
+	
+	public RuleTextPane(String text) {
+		super(text);
 		setTokenHighlighter(this);
 		setUI(new RuleTextPane.UI());
 	}
