@@ -72,10 +72,20 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	};
 	
 	public HighlightedTextPane() {
-		document = new CustomDocument();
+		super();
+		initialize(new CustomDocument());
+	}
+	
+	public HighlightedTextPane(CustomDocument doc) {
+		super();
+		initialize(doc);
+	}
+	
+	private void initialize(CustomDocument doc) {
+		document = doc;
 		document.addDocumentListener(this);
 		document.addUndoableEditListener(undoableEditListener);
-		setDocument(document);
+		setStyledDocument(document);
 		addKeyListener(this);
 		setUI(new HighlightedTextPane.UI());
 	}
