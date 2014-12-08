@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -14,7 +15,7 @@ import javax.swing.text.StyleConstants;
 import providers.Rule;
 import system.RuleCompiler;
 
-public class RuleTextPane extends HighlightedTextPane implements HighlightedTextPane.TokenHighlighter {
+public class RuleTextPane extends HighlightedTextPane implements HighlightedTextPane.TokenHighlighter, DocumentListener {
 	
 	/** コールバックのインタフェース定義 */
 	public interface Callbacks {
@@ -106,24 +107,20 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		return attributeSetMap.get(token.toLowerCase());
 	}
 	
-//	@Override
-//	public void insertUpdate(DocumentEvent e) {
-//		super.insertUpdate(e);
+	@Override
+	public void insertUpdate(DocumentEvent e) {
 //		traverseRules(0); // FIXME
 //		updateSuggestions();
-//	}
-//
-//	@Override
-//	public void removeUpdate(DocumentEvent e) {
-//		super.removeUpdate(e);
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent e) {
 //		traverseRules(0); // FIXME
 //		updateSuggestions();
-//	}
+	}
 	
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-		super.changedUpdate(e);
-		
 		System.out.println(compiler.compile(getText()));
 	}
 	

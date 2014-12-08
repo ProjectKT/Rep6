@@ -4,11 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.NoSuchElementException;
 
+import javax.swing.JEditorPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
@@ -22,15 +23,15 @@ import javax.swing.plaf.basic.BasicTextPaneUI;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
-import javax.swing.text.GapContent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.Segment;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleContext;
-import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
-import javax.swing.text.DefaultStyledDocument.AttributeUndoableEdit;
+import javax.swing.text.StyledEditorKit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
@@ -42,7 +43,7 @@ import utils.CharArrayTokenizer;
 /**
  * RuleBaseSystem のルールをハイライトする機能を持った JTextPane
  */
-public class HighlightedTextPane extends JTextPane implements DocumentListener, KeyListener {
+public class HighlightedTextPane extends JTextPane {
 	
 	/** dummy interface implementation */
 	private static final TokenHighlighter sDummyTokenHighlighter = new TokenHighlighter() {
@@ -53,10 +54,11 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	/** UndoManager */
 	private final CustomUndoManager undoManager = new CustomUndoManager();
 	private CustomDocument document;
+	/** TokenHighlighter */
 	private char[] delimiters = new char[]{' ','\n','\r','\t','\f'};
 	private TokenHighlighter tokenHighlighter = sDummyTokenHighlighter;
 	/** default attribute set applied to tokens  when null AttributeSet is returned from {@link HighlightedTextPane#TokenHighlighter} */
-	private AttributeSet defaultAttributeSet = new SimpleAttributeSet();
+	private MutableAttributeSet defaultAttributeSet = new SimpleAttributeSet();
 	/** CharacterAttribute を変更している最中かどうか */
 	boolean changingCharacterAttributes = false;
 	/** キャレットの存在する行をハイライトする背景色 */
@@ -68,6 +70,57 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		@Override
 		public void undoableEditHappened(UndoableEditEvent e) {
 			undoManager.addEdit(e.getEdit());
+		}
+	};
+	
+	/** DocumentListener */
+	private DocumentListener documentListener = new DocumentListener() {
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			try {
+				stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
+			} catch (BadLocationException e1) {
+				e1.printStackTrace();
+			}
+		}
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			try {
+				stylizeDocument(e.getOffset(), e.getOffset()+e.getLength());
+			} catch (BadLocationException e1) {
+				e1.printStackTrace();
+			}
+		}
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			if (!changingCharacterAttributes) {
+				try {
+					stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
+				} catch (BadLocationException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+	};
+	
+	/** KeyAdapter */
+	private KeyAdapter keyAdapter = new KeyAdapter() {
+		@Override
+		public void keyPressed(KeyEvent e) {
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_Z:
+				if (e.isControlDown() || e.isMetaDown()) {
+					if (e.isShiftDown()) {
+						// redo
+						try { undoManager.redo(); } catch (CannotRedoException e1) { Toolkit.getDefaultToolkit().beep(); }
+					} else {
+						// undo
+						try { undoManager.undo(); } catch (CannotUndoException e1) { Toolkit.getDefaultToolkit().beep(); }
+					}
+					e.consume();
+				}
+				break;
+			}
 		}
 	};
 	
@@ -83,24 +136,29 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	
 	public HighlightedTextPane(String text) {
 		super();
-		 StyleContext sc = new StyleContext();
-		 CustomDocument doc = new CustomDocument();
-		    try {
-				doc.insertString(0, text, sc.getStyle(StyleContext.DEFAULT_STYLE));
-			} catch (BadLocationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		StyleContext sc = new StyleContext();
+		CustomDocument doc = new CustomDocument();
+		try {
+			doc.insertString(0, text, sc.getStyle(StyleContext.DEFAULT_STYLE));
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 		initialize(doc);
+		try {
+			stylizeDocument(0, document.getLength());
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void initialize(CustomDocument doc) {
 		document = doc;
-		document.addDocumentListener(this);
+		document.addDocumentListener(documentListener);
 		document.addUndoableEditListener(undoableEditListener);
 		setStyledDocument(document);
-		addKeyListener(this);
+		addKeyListener(keyAdapter);
 		setUI(new HighlightedTextPane.UI());
+		setDefaultAttributeSet(new SimpleAttributeSet());
 	}
 	
 	
@@ -116,9 +174,14 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	 * デフォルトの AttributeSet を設定する
 	 * @param attr
 	 */
-	public void setDefaultAttributeSet(AttributeSet attr) {
+	public void setDefaultAttributeSet(MutableAttributeSet attr) {
 		defaultAttributeSet = attr;
-		updateWholeTokenStyle();
+		try {
+			document.setCharacterAttributes(0, document.getLength(), attr, true);
+			stylizeDocument(0, document.getLength());
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -128,62 +191,6 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	public void setLineHighlightColor(Color color) {
 		lineHighlightColor = color;
 	}
-
-	@Override
-	public void insertUpdate(DocumentEvent e) {
-//		System.out.println("insertUpdate(): offset="+e.getOffset()+", length="+e.getLength());
-		try {
-			stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
-		} catch (BadLocationException e1) {
-			e1.printStackTrace();
-		}
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent e) {
-//		System.out.println("removeUpdate(): offset="+e.getOffset()+", length="+e.getLength());
-		try {
-			stylizeDocument(e.getOffset()-e.getLength(), e.getOffset()-e.getLength()+1);
-		} catch (BadLocationException e1) {
-			e1.printStackTrace();
-		}
-	}
-
-	@Override
-	public void changedUpdate(DocumentEvent e) {
-		if (!changingCharacterAttributes) {
-//			System.out.println("changedUpdate(): offset="+e.getOffset()+", length="+e.getLength());
-			try {
-				stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
-			} catch (BadLocationException e1) {
-				e1.printStackTrace();
-			}
-		}
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) { }
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		switch (e.getKeyCode()) {
-		case KeyEvent.VK_Z:
-			if (e.isControlDown() || e.isMetaDown()) {
-				if (e.isShiftDown()) {
-					// redo
-					try { undoManager.redo(); } catch (CannotRedoException e1) { Toolkit.getDefaultToolkit().beep(); }
-				} else {
-					// undo
-					try { undoManager.undo(); } catch (CannotUndoException e1) { Toolkit.getDefaultToolkit().beep(); }
-				}
-				e.consume();
-			}
-			break;
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) { }
 	
 	public void setCharacterAttributes(final int offset, final int length, final AttributeSet s, final boolean replace) throws InvocationTargetException {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -194,13 +201,11 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		});
 	}
 	
-	/**
-	 * ドキュメント全体のトークンのハイライトを更新する
-	 */
-	private void updateWholeTokenStyle() {
-		// TODO implement this method
+	@Override
+	public MutableAttributeSet getInputAttributes() {
+		return defaultAttributeSet;
 	}
-	
+
 	/**
 	 * ドキュメント特定の範囲の文字列をハイライトする
 	 * @param start
@@ -214,7 +219,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		//   |   |      -->  |       |
 		//   |  end          |      end
 		// start           start
-//		System.out.println("stylizeDocument("+start+", "+end+")");
+		System.out.println("stylizeDocument("+start+", "+end+")");
 		
 		CharArrayTokenizer at = (start < end) ?
 				document.getTokenizer().from(start).reverse():
@@ -229,19 +234,19 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		final int maxPosition = Math.min((start < end) ? end : start, document.getLength());
 
 		int pos = at.getCurrentPosition();
-//		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
-		while (minPosition <= pos && pos < maxPosition && at.hasMoreElements()) {
+		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
+		while (minPosition <= pos && pos <= maxPosition && at.hasMoreElements()) {
 			String token = at.nextToken();
 			pos = at.getCurrentPosition();
 			if (-1 <= pos) {
 				AttributeSet attr = tokenHighlighter.getAttributeSetForToken(token);
-				attr = (attr == null) ? defaultAttributeSet : attr;
-				if (start < end) {
-//					System.out.println(" token: "+token+" ("+(pos-token.length())+" --> "+(pos)+")");
-					try { setCharacterAttributes(pos-token.length(), token.length(), attr, true); } catch (InvocationTargetException e) { }
-				} else {
-//					System.out.println(" token: "+token+" ("+(pos+1)+" --> "+(pos+token.length())+")");
-					try { setCharacterAttributes(pos+1, token.length(), attr, true); } catch (InvocationTargetException e) { }
+				attr = (attr == null && getCharacterAttributes() != null) ? defaultAttributeSet : attr;
+				if (attr != null) {
+					if (start < end) {
+						try { setCharacterAttributes(pos-token.length(), token.length(), attr, true); } catch (InvocationTargetException e) { }
+					} else {
+						try { setCharacterAttributes(pos+1, token.length(), attr, true); } catch (InvocationTargetException e) { }
+					}
 				}
 			}
 		}
@@ -273,7 +278,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 				changingCharacterAttributes = false;
 			}
 		}
-		
+
 		/**
 		 * CharArrayTokenizer を返す
 		 * @return
@@ -303,7 +308,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 				final EventType theEditType = ((AbstractDocument.DefaultDocumentEvent) anEdit).getType();
 				
 				// プログラム側からの変更(スタイルの変更等)なら無視
-				if (theEditType == EventType.CHANGE) {
+				if (theEditType == EventType.CHANGE && changingCharacterAttributes) {
 					return false;
 				}
 				
