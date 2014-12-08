@@ -34,8 +34,8 @@ public class OurTest extends JFrame implements ActionListener {
 	JTextArea area3;
 	
   public static void main(String[] args){
-    OurTest frame = new OurTest();
-
+	 OurTest frame = new OurTest();
+    
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setBounds(10, 10, 300, 200);
     frame.setTitle("タイトル");

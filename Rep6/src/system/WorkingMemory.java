@@ -94,4 +94,22 @@ class WorkingMemory {
 		return assertions.toString();
 	}
 
+	/**
+	 * 	ワーキングメモリの一部の情報をstringで返す
+	 * @param i
+	 * @return
+	 */
+	
+	public String getString(int i){
+		return assertions.get(i);
+	}
+	
+	/**
+	 * ワーキングメモリのサイズを返す
+	 * @return
+	 */
+	public int size(){
+		return this.assertions.size();
+	}
+	
 }
