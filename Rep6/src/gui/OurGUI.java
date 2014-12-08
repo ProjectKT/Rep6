@@ -103,13 +103,12 @@ public class OurGUI extends JFrame implements ActionListener{
 		JPanel tab2 = new JPanel();//編集ページ
 		JScrollPane sp = new JScrollPane(ruleTextPane);
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		sp.setPreferredSize(new Dimension(900,700));
-		getContentPane().add(sp);
+		sp.setPreferredSize(new Dimension(900, 700));
+		getContentPane().add(sp, BorderLayout.CENTER);
 		tab2.add(sp);
 		tabbedPane.addTab("編集",tab2);
 
-
-		getContentPane().add(tabbedPane,BorderLayout.CENTER);
+		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
 		
 	}
