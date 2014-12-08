@@ -3,23 +3,39 @@ package components;
 import java.awt.Color;
 import java.awt.ScrollPane;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 
-import components.HighlightedTextPane.CustomDocument;
-import providers.OurSuffixArray;
-import providers.SuffixArray;
+import providers.Rule;
 import system.RuleCompiler;
 
 public class RuleTextPane extends HighlightedTextPane implements HighlightedTextPane.TokenHighlighter {
+	
+	/** コールバックのインタフェース定義 */
+	public interface Callbacks {
+		/** ルールが生成されたときに呼ばれる */
+		public void onRuleCreated(Rule rule);
+		/** ルールが削除された時に呼ばれる */
+		public void onRuleRemoved(Rule rule);
+		/** SuffixArray から Suggestion を取得するときに呼ばれる */
+		public void getSuggestions(String input);
+	}
+	
+	protected static final Callbacks sDummyCallbacks = new Callbacks() {
+		@Override
+		public void onRuleCreated(Rule rule) { }
+		@Override
+		public void onRuleRemoved(Rule rule) { }
+		@Override
+		public void getSuggestions(String input) { }
+	};
+	
+	/** コールバック */
+	private Callbacks callbacks = sDummyCallbacks;
 	
 	/**
 	 * RuleTextPane で用いる AttributeSet
@@ -57,8 +73,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		put("then", RuleAttributeSet.thenClause);
 	}};
 	
-	/** SuffixArray */
-	private SuffixArray suffixArray = new OurSuffixArray();
+	/** SyntaxChecker */
 	private RuleCompiler compiler = new RuleCompiler();
 	
 
@@ -72,6 +87,14 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		super(text);
 		setTokenHighlighter(this);
 		setUI(new RuleTextPane.UI());
+	}
+	
+	/**
+	 * コールバックを設定する
+	 * @param callbacks コールバックインターフェースの実装
+	 */
+	public void setCallbacks(Callbacks callbacks) {
+		this.callbacks = (callbacks == null) ? sDummyCallbacks : callbacks;
 	}
 	
 	/**
@@ -109,18 +132,6 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 	 */
 	private void traverseRules(int startPos) {
 		// TODO implement this method
-	}
-
-	/**
-	 * SuffixArray を使って Suggestions を更新する
-	 */
-	private void updateSuggestions() {
-		String token = getLastEditedToken();
-		System.out.println(" --- "+token+" --- ");
-		Iterator<String> sentences = suffixArray.getAllSentences(token);
-		while (sentences.hasNext()) {
-			System.out.println(sentences.next());
-		}
 	}
 
 	/**
