@@ -117,7 +117,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 
 	@Override
 	public void insertUpdate(DocumentEvent e) {
-		System.out.println("insertUpdate(): offset="+e.getOffset()+", length="+e.getLength());
+//		System.out.println("insertUpdate(): offset="+e.getOffset()+", length="+e.getLength());
 		try {
 			stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
 		} catch (BadLocationException e1) {
@@ -127,7 +127,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {
-		System.out.println("removeUpdate(): offset="+e.getOffset()+", length="+e.getLength());
+//		System.out.println("removeUpdate(): offset="+e.getOffset()+", length="+e.getLength());
 		try {
 			stylizeDocument(e.getOffset()-e.getLength(), e.getOffset()-e.getLength()+1);
 		} catch (BadLocationException e1) {
@@ -138,7 +138,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
 		if (!changingCharacterAttributes) {
-			System.out.println("changedUpdate(): offset="+e.getOffset()+", length="+e.getLength());
+//			System.out.println("changedUpdate(): offset="+e.getOffset()+", length="+e.getLength());
 			try {
 				stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
 			} catch (BadLocationException e1) {
@@ -200,7 +200,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		//   |   |      -->  |       |
 		//   |  end          |      end
 		// start           start
-		System.out.println("stylizeDocument("+start+", "+end+")");
+//		System.out.println("stylizeDocument("+start+", "+end+")");
 		
 		CharArrayTokenizer at = (start < end) ?
 				document.getTokenizer().from(start).reverse():
@@ -215,7 +215,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		final int maxPosition = Math.min((start < end) ? end : start, document.getLength());
 
 		int pos = at.getCurrentPosition();
-		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
+//		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
 		while (minPosition <= pos && pos < maxPosition && at.hasMoreElements()) {
 			String token = at.nextToken();
 			pos = at.getCurrentPosition();
@@ -223,10 +223,10 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 				AttributeSet attr = tokenHighlighter.getAttributeSetForToken(token);
 				attr = (attr == null) ? defaultAttributeSet : attr;
 				if (start < end) {
-					System.out.println(" token: "+token+" ("+(pos-token.length())+" --> "+(pos)+")");
+//					System.out.println(" token: "+token+" ("+(pos-token.length())+" --> "+(pos)+")");
 					try { setCharacterAttributes(pos-token.length(), token.length(), attr, true); } catch (InvocationTargetException e) { }
 				} else {
-					System.out.println(" token: "+token+" ("+(pos+1)+" --> "+(pos+token.length())+")");
+//					System.out.println(" token: "+token+" ("+(pos+1)+" --> "+(pos+token.length())+")");
 					try { setCharacterAttributes(pos+1, token.length(), attr, true); } catch (InvocationTargetException e) { }
 				}
 			}
@@ -268,7 +268,7 @@ public class HighlightedTextPane extends JTextPane implements DocumentListener, 
 		public CharArrayTokenizer getTokenizer() throws BadLocationException {
 			Segment txt = new Segment();
 			getText(0, getLength(), txt);
-			System.out.println("getTokenizer(): (len="+getLength()+"), "+txt+", offset="+txt.offset+", count="+txt.count);
+//			System.out.println("getTokenizer(): (len="+getLength()+"), "+txt+", offset="+txt.offset+", count="+txt.count);
 			return new CharArrayTokenizer(txt.array, delimiters)
 						.offset(txt.offset)
 						.limit(txt.count);

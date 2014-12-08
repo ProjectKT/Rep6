@@ -11,17 +11,6 @@ public class RuleCompiler {
 	
 	private CharArrayStreamTokenizer st;
 	
-//	/**
-//	 * 文法の確認
-//	 * @param txt
-//	 * @return
-//	 */
-//	public Result check(String txt) {
-//		tokenizer = new StringTokenizer(txt);
-//		
-//		
-//	}
-	
 	public Result compile(String txt) {
 		Result result = new Result();
 		ArrayList<RuleContainer> rules = new ArrayList<RuleContainer>();

@@ -107,7 +107,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 	private void updateSuggestions() {
 		String token = getLastEditedToken();
 		System.out.println(" --- "+token+" --- ");
-		Iterator<String> sentences = suffixArray.getSentences(token);
+		Iterator<String> sentences = suffixArray.getAllSentences(token);
 		while (sentences.hasNext()) {
 			System.out.println(sentences.next());
 		}

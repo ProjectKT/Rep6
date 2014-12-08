@@ -217,7 +217,7 @@ public class SuffixArray {
 	 * @param suffix
 	 * @return
 	 */
-	public Iterator<String> getSentencesALL(String word) {
+	public Iterator<String> getAllSentences(String word) {
 		TreeSet<String> sentences = new TreeSet<String>();
 		Iterator<String> it = setSuffixTree(word);
 		while (it.hasNext()) {
@@ -236,7 +236,7 @@ public class SuffixArray {
 	 * @param suffix
 	 * @return
 	 */
-	public Iterator<String> getSentencesExist(String word) {
+	public Iterator<String> getExistingSentences(String word) {
 		TreeSet<String> sentences = new TreeSet<String>();
 		Iterator<String> it = setSuffixTree(word);
 		String sentence;

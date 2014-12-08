@@ -90,7 +90,7 @@ public class CharArrayTokenizer implements Enumeration<String> {
 		
 		int start = currentPosition;
 		int end = scanToken(currentPosition);
-		System.out.println("nextToken(): start="+start+", end="+end+", offset="+offset+", max="+maxPosition);
+//		System.out.println("nextToken(): start="+start+", end="+end+", offset="+offset+", max="+maxPosition);
 		currentPosition = end;
 		return new String(reverse ? Arrays.copyOfRange(array, end+1, start+1) : Arrays.copyOfRange(array, start, end));
 	}

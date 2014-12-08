@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class test extends JFrame implements ActionListener {
+public class OurTest extends JFrame implements ActionListener {
 	OurSuffixArray osa = new OurSuffixArray();
 	static FileManager fm;
 	ArrayList<Rule> rules = new ArrayList<Rule>();
@@ -31,7 +31,7 @@ public class test extends JFrame implements ActionListener {
 	JTextArea area3;
 	
   public static void main(String[] args){
-    test frame = new test();
+    OurTest frame = new OurTest();
 
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setBounds(10, 10, 300, 200);
@@ -39,7 +39,7 @@ public class test extends JFrame implements ActionListener {
     frame.setVisible(true);
   }
 
-  test(){
+  OurTest(){
 	  loadData();
 		setupSuffixArray();
     JTabbedPane tabbedpane = new JTabbedPane();

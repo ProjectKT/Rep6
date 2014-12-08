@@ -3,12 +3,12 @@ package gui;
 import java.awt.*;
 import javax.swing.*;
 
-public class gui extends JFrame{
+public class OurGUI extends JFrame{
 
 	// コンストラクタ
-	public gui() {
+	public OurGUI() {
 		initialize();
-		JTabbedPane
+//		JTabbedPane
 		setVisible(true);
 	}
 	
@@ -19,7 +19,7 @@ public class gui extends JFrame{
 		setTitle("gui");
 	}
 	
-	JTabbedPaneTest2(){
+	void test(){
 	    JTabbedPane tabbedpane = new JTabbedPane();
 
 	    JPanel tabPanel1 = new JPanel();
@@ -38,7 +38,7 @@ public class gui extends JFrame{
 	public static void main(String[] args) {
 		//
 		
-		gui gui = new gui();
+		OurGUI gui = new OurGUI();
 		gui.setVisible(true);
 	}
 }
