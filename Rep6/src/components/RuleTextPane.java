@@ -13,6 +13,7 @@ import javax.swing.text.StyleConstants;
 
 import providers.OurSuffixArray;
 import providers.SuffixArray;
+import system.RuleCompiler;
 
 public class RuleTextPane extends HighlightedTextPane implements HighlightedTextPane.TokenHighlighter {
 	
@@ -54,6 +55,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 	
 	/** SuffixArray */
 	private SuffixArray suffixArray = new OurSuffixArray();
+	private RuleCompiler compiler = new RuleCompiler();
 	
 
 	public RuleTextPane() {
@@ -83,6 +85,13 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 //		traverseRules(0); // FIXME
 //		updateSuggestions();
 //	}
+	
+	@Override
+	public void changedUpdate(DocumentEvent e) {
+		super.changedUpdate(e);
+		
+		System.out.println(compiler.compile(getText()));
+	}
 	
 	/**
 	 * ルールのかたまりを見つけてハイライト、SuffixArray の更新を行う
