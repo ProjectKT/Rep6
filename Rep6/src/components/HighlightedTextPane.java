@@ -219,7 +219,7 @@ public class HighlightedTextPane extends JTextPane {
 		//   |   |      -->  |       |
 		//   |  end          |      end
 		// start           start
-		System.out.println("stylizeDocument("+start+", "+end+")");
+//		System.out.println("stylizeDocument("+start+", "+end+")");
 		
 		CharArrayTokenizer at = (start < end) ?
 				document.getTokenizer().from(start).reverse():
@@ -234,10 +234,10 @@ public class HighlightedTextPane extends JTextPane {
 		final int maxPosition = Math.min((start < end) ? end : start, document.getLength());
 
 		int pos = at.getCurrentPosition();
-		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
-		System.out.println((minPosition <= pos)+","+(pos <= maxPosition)+","+at.hasMoreTokens()+", "+at.getCurrentPosition());
+//		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
+//		System.out.println((minPosition <= pos)+","+(pos <= maxPosition)+","+at.hasMoreTokens()+", "+at.getCurrentPosition());
 		while (minPosition <= pos && pos <= maxPosition && at.hasMoreElements()) {
-			String token = at.nextToken(); System.out.println(token);
+			String token = at.nextToken();
 			pos = at.getCurrentPosition();
 			if (-1 <= pos) {
 				AttributeSet attr = tokenHighlighter.getAttributeSetForToken(token);
