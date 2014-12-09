@@ -2,21 +2,17 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -32,8 +28,9 @@ import javax.swing.JTextField;
 import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
+import system.RuleBase;
+
 import components.RuleTextPane;
-import system.*;
 
 public class OurGUI extends JFrame implements ActionListener , ComponentListener{
 
@@ -78,9 +75,8 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		}
 		
 		@Override
-		public List<String> getSuggestions(String input) {
-//			return osa.getAllSentences(input); // FIXME 本当は Iterator よりも List そのものを返してくれた方が嬉しい。まあどっちでもいいけど
-			return null;
+		public Iterator<String> getSuggestions(String input) {
+			return osa.getAllSentences(input);
 		}
 	};
     
