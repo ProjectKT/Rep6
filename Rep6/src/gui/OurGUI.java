@@ -168,7 +168,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		ruleTextPane.setCallbacks(ruleTextPaneCallbacks);
 		sp = new JScrollPane(ruleTextPane);
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		sp.setPreferredSize(new Dimension(getWidth()-10, getHeight()-100));
+		sp.setPreferredSize(new Dimension(getWidth()-50, getHeight()-100));
 		addComponentListener(this);
 		getContentPane().add(sp, BorderLayout.CENTER);
 		tab2.add(sp);
@@ -280,7 +280,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	public void componentResized(ComponentEvent e) {
 		// TODO Auto-generated method stub
 		System.out.println("!!!");
-		sp.setPreferredSize(new Dimension(getWidth()-10, getHeight()-50));
+		sp.setPreferredSize(new Dimension(getWidth()-50, getHeight()-100));
 		setVisible(true);
 	}
 
