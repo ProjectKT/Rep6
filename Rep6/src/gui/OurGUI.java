@@ -33,7 +33,10 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
+<<<<<<< HEAD
 
+=======
+>>>>>>> branch 'master' of https://github.com/ProjectKT/Rep6.git
 import components.HighlightedTextPane;
 import components.RuleTextPane;
 
