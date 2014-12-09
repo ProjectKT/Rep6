@@ -20,7 +20,9 @@ import providers.*;
 		WorkingMemory wm;
 		ArrayList<String> wmTemp;
 		ArrayList<Rule> rules;
-
+		ArrayList<String> backwardResult;
+		
+		
 		/**
 		 * 	コンストラクタ　引数ありver
 		 * @param rule
@@ -30,7 +32,7 @@ import providers.*;
 		public RuleBase(ArrayList<Rule> rule,ArrayList<String> wmString) {
 
 			wm = new WorkingMemory();
-
+			wmTemp = wmString;
 			//ワーキングメモリのセット
 				for(String temp:wmString){
 					wm.addAssertion(temp);
@@ -116,6 +118,31 @@ import providers.*;
 			return text;
 		}
 		
+		
+		/**
+		 * 前向き推論の答えを返す
+		 * @return
+		 */
+		public ArrayList<String> getForwardAnswer(){
+			ArrayList<String> result = new ArrayList<String>();
+			
+			for(int i = 0 ; i < wm.size();i++){
+				if(!wmTemp.contains(wm.getString(i))){
+					result.add(wm.getString(i));
+				}
+			}
+			
+			return result;
+		}
+		
+		/**
+		 * 後ろ向き推論の答えを返す
+		 * @return
+		 */
+		public ArrayList<String> getBackwardAnswer(){
+			return this.backwardResult;
+		}
+		
 		private String instantiate(String thePattern, HashMap theBindings) {
 			String result = new String();
 			StringTokenizer st = new StringTokenizer(thePattern);
@@ -186,6 +213,7 @@ import providers.*;
 		**/
 		public void backwardChain(ArrayList<String> hypothesis) {
 			System.out.println("Hypothesis:" + hypothesis);
+			backwardResult = new ArrayList<String>();
 			ArrayList<String> orgQueries = (ArrayList) hypothesis.clone();
 			// HashMap<String,String> binding = new HashMap<String,String>();
 			HashMap<String, String> binding = new HashMap<String, String>();
@@ -197,6 +225,7 @@ import providers.*;
 					String aQuery = (String) orgQueries.get(i);
 					System.out.println("binding: " + binding);
 					String anAnswer = instantiate(aQuery, binding);
+					backwardResult.add(anAnswer);
 					System.out.println("Query: " + aQuery);
 					System.out.println("Answer:" + anAnswer);
 				}
