@@ -118,10 +118,10 @@ public class OurTest extends JFrame implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("OK");
-		RuleBase rb = new RuleBase();
-		rb.forwardChain();
-		area3.setText(rb.get_answer());
+//		System.out.println("OK");
+//		RuleBase rb = new RuleBase();
+//		rb.forwardChain();
+//		area3.setText(rb.get_answer());
 	}
 
 

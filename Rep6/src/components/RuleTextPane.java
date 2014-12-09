@@ -229,7 +229,9 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 			request = new RuleCompileRequest(e.getOffset(), COMPILE_DELAY_MILLISECONDS);
 			ruleCompileQueue.add(request);
 		}
-		showSuggestions(getLastEditedToken());
+		if (e.getLength() == 1) {
+			showSuggestions(getLastEditedToken());
+		}
 	}
 
 	@Override
@@ -242,7 +244,9 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 			request = new RuleCompileRequest(e.getOffset(), COMPILE_DELAY_MILLISECONDS);
 			ruleCompileQueue.add(request);
 		}
-		showSuggestions(getLastEditedToken());
+		if (e.getLength() == 1) {
+			showSuggestions(getLastEditedToken());
+		}
 	}
 	
 	@Override

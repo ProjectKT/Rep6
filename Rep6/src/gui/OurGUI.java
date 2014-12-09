@@ -37,6 +37,7 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
+
 import components.DataFilter;
 import components.RuleTextPane;
 
@@ -103,33 +104,6 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		
 		loadData();
 		setupSuffixArray();
-		
-		// 2014-12-08 h.m. loadRuleFile() に移行
-//		for(int i =0; i<rules.size();i++ )
-//	    	text = text + rules.get(i).toString2()+"\n";
-//		
-//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//	    DocumentBuilder builder = null;
-//	    Document doc;
-//		try {
-//			builder = factory.newDocumentBuilder();
-//		} catch (ParserConfigurationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	    ByteArrayInputStream stream = new ByteArrayInputStream(text.getBytes());
-//	    try {
-//			doc = builder.parse(stream);
-//		} catch (SAXException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//
-//	    ruleTextPane.setToolTipText(text);
 		
 		set();
 		setVisible(true);
@@ -302,23 +276,10 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	
 	private void setupTextPane(){
 		File file = new File(currentRuleFileName);
-		String text;
-		try {
-			text = readFile(file);
-			ruleTextPane.setText(text);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		loadRuleFile(file);
 		
 		file = new File(currentWmFileName);
-		try {
-			text = readFile(file);
-			ruleTextPane2.setText(text);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		loadWMFile(file);
 	}
 	
 	/**
@@ -449,22 +410,22 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			}
 		} else if (s == mntmExit) {
 			dispose();
-		}else if(s == forward){
-			rb = new RuleBase(rules,wm);
+		} else if (s == forward) {
+			rb = new RuleBase(rules, wm);
 			rb.forwardChain();
-		}else if(s == backward){
-			rb = new RuleBase(rules,wm);
+		} else if (s == backward) {
+			rb = new RuleBase(rules, wm);
 			ArrayList<String> temptf = new ArrayList<String>();
 			String[] tf2 = tf.getText().split(",");
-			for(String str:tf2){
+			for (String str : tf2) {
 				temptf.add(str);
 			}
 			rb.backwardChain(temptf);
-		}else if(s == mntmSaveRuleFile){
+		} else if (s == mntmSaveRuleFile) {
 			saveRuleFile(currentRuleFileName);
-		}else if(s == mntmSaveWMFile){
+		} else if (s == mntmSaveWMFile) {
 			saveWmFile(currentWmFileName);
-		}else if(s == mntmSaveAsRuleFile){
+		} else if (s == mntmSaveAsRuleFile) {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.addChoosableFileFilter(new DataFilter());
 			fileChooser.setCurrentDirectory(currentDirectory);
@@ -475,8 +436,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 				currentDirectory = file.getParentFile();
 				saveRuleFile(file.getName());
 			}
-			
-		}else if(s == mntmSaveAsWMFile){
+		} else if (s == mntmSaveAsWMFile) {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.addChoosableFileFilter(new DataFilter());
 			fileChooser.setCurrentDirectory(currentDirectory);
@@ -488,13 +448,11 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 				saveRuleFile(file.getName());
 			}
 		}
-		
 	}
 
 
 	@Override
 	public void componentResized(ComponentEvent e) {
-		// TODO Auto-generated method stub
 		System.out.println("!!!");
 		sp1.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 		sp2.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
@@ -502,23 +460,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	}
 
 	@Override
-	public void componentMoved(ComponentEvent e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void componentShown(ComponentEvent e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void componentHidden(ComponentEvent e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void stateChanged(ChangeEvent e) {
-		// TODO Auto-generated method stub
 		 if(ruleEdit.isSelected()) {
 			 sp2.setVisible(false);
 			 sp1.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
@@ -531,7 +473,13 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			 sp2.setVisible(true);
 			 sp2.getParent().revalidate();
         }
-        
 	}
+
+	@Override
+	public void componentMoved(ComponentEvent e) { }
+	@Override
+	public void componentShown(ComponentEvent e) { }
+	@Override
+	public void componentHidden(ComponentEvent e) { }
 }
 
