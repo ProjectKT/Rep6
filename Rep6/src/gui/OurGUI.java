@@ -4,6 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,10 +29,9 @@ import javax.swing.JTextField;
 import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
-
 import components.RuleTextPane;
 
-public class OurGUI extends JFrame implements ActionListener {
+public class OurGUI extends JFrame implements ActionListener , ComponentListener{
 
 	private static final String[] RULE_FILES = {"AnimalWorld.data","CarShop.data"};
 	private static final String[] WM_FILES = {"AnimalWorldWm.data","CarShopWm.data"};
@@ -40,6 +43,7 @@ public class OurGUI extends JFrame implements ActionListener {
 	static FileManager fm;
 	ArrayList<Rule> rules = new ArrayList<Rule>();
 	ArrayList<String> wm = new ArrayList<String>();
+	JScrollPane sp;
 	
 	// --- ビューのメンバ ---
 	JMenuItem mntmOpenRuleFile;
@@ -162,9 +166,10 @@ public class OurGUI extends JFrame implements ActionListener {
 		JPanel tab2 = new JPanel();//編集ページ
 		ruleTextPane = new RuleTextPane();
 		ruleTextPane.setCallbacks(ruleTextPaneCallbacks);
-		JScrollPane sp = new JScrollPane(ruleTextPane);
+		sp = new JScrollPane(ruleTextPane);
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		sp.setPreferredSize(new Dimension(900, 700));
+		sp.setPreferredSize(new Dimension(getWidth()-10, getHeight()-100));
+		addComponentListener(this);
 		getContentPane().add(sp, BorderLayout.CENTER);
 		tab2.add(sp);
 		tabbedPane.addTab("編集",tab2);
@@ -268,6 +273,33 @@ public class OurGUI extends JFrame implements ActionListener {
 		} else if (s == mntmExit) {
 			dispose();
 		}
+	}
+
+
+	@Override
+	public void componentResized(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		System.out.println("!!!");
+		sp.setPreferredSize(new Dimension(getWidth()-10, getHeight()-50));
+		setVisible(true);
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void componentShown(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void componentHidden(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

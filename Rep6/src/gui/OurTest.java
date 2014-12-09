@@ -74,12 +74,11 @@ public class OurTest extends JFrame implements ActionListener {
     area3 = new JTextArea();
     JPanel tabPanel3 = new JPanel();
     JButton b1 =new JButton("button2");
-
     JScrollPane scrollPane = new JScrollPane(area3);
 	scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	scrollPane.setPreferredSize(new Dimension(200, 100));
 	getContentPane().add(scrollPane, BorderLayout.CENTER);
-    
+    tabPanel2.add(ruleTextPane,BorderLayout.CENTER);
     
     b1.addActionListener(this);
 	getContentPane().add(b1);
@@ -87,7 +86,7 @@ public class OurTest extends JFrame implements ActionListener {
     tabPanel3.add(scrollPane);  
 
     tabbedpane.addTab("main", tabPanel1);
-    tabbedpane.addTab("変更", ruleTextPane);
+    tabbedpane.addTab("変更", tabPanel2);
     tabbedpane.addTab("質問", tabPanel3);
 
     
