@@ -21,30 +21,48 @@ import providers.*;
 		ArrayList<String> wmTemp;
 		ArrayList<Rule> rules;
 
+		/**
+		 * 	コンストラクタ　引数ありver
+		 * @param rule
+		 * @param wmString
+		 */
+		
+		public RuleBase(ArrayList<Rule> rule,ArrayList<String> wmString) {
+
+			wm = new WorkingMemory();
+
+			//ワーキングメモリのセット
+				for(String temp:wmString){
+					wm.addAssertion(temp);
+				}
+			
+			//ルールのセット
+				this.rules = rule;
+		}
+
+		/*
+		 * 	コンストラクタ　引数無しver
+		 * 
 		public RuleBase() {
 			fileName = "CarShop.data";
 			wmFileName = "CarShopWm.data";
 			fm = new FileManager();
 			wm = new WorkingMemory();
 			wmTemp = new ArrayList<String>();
-			/*
-			wm.addAssertion("my-car is inexpensive");
-			wm.addAssertion("my-car has a VTEC engine");
-			wm.addAssertion("my-car is stylish");
-			wm.addAssertion("my-car has several color models");
-			wm.addAssertion("my-car has several seats");
-			wm.addAssertion("my-car is a wagon");
-			*/
 			wmTemp = fm.loadWm(wmFileName);
-			
+	
+			//ワーキングメモリのセット
 			for(String temp:wmTemp){
 				wm.addAssertion(temp);
 			}
-			
+
+
+			//ルールのセット
 			rules = new ArrayList<Rule>();
 			loadRules(fileName);
 		}
-
+		
+		*/
 		
 		/**
 		 *  ルールのセット
@@ -53,6 +71,7 @@ import providers.*;
 			this.rules = rule;
 		}
 			
+
 		
 		/**
 		 * 前向き推論を行うためのメソッド

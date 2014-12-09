@@ -30,6 +30,7 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import components.RuleTextPane;
+import system.*;
 
 public class OurGUI extends JFrame implements ActionListener , ComponentListener{
 
@@ -43,13 +44,20 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	static FileManager fm;
 	ArrayList<Rule> rules = new ArrayList<Rule>();
 	ArrayList<String> wm = new ArrayList<String>();
-	JScrollPane sp;
+
+	RuleBase rb;
+	
 	
 	// --- ビューのメンバ ---
 	JMenuItem mntmOpenRuleFile;
 	JMenuItem mntmOpenWMFile;
 	JMenuItem mntmExit;
     RuleTextPane ruleTextPane;
+	JScrollPane sp;
+	JButton forward;
+	JButton backward;
+	JTextField tf;
+
     
     /**
      * RuleTextPane のコールバック
@@ -148,19 +156,19 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 
 		tabbedPane.addTab("質問",tab1);
 //		getContentPane().setLayout(new GridLayout(2,2));
-		JTextField tf = new JTextField("",20);
+		tf = new JTextField("",20);
 		getContentPane().add(tf);
 		tab1.add(tf);
 		
-		JButton b1 = new JButton("OK");
-		b1.addActionListener(this);
-		getContentPane().add(b1);
-		tab1.add(b1);
+		forward = new JButton("前");
+		forward.addActionListener(this);
+		getContentPane().add(forward);
+		tab1.add(forward);
 
-		JButton b2 = new JButton("OK");
-		b2.addActionListener(this);
-		getContentPane().add(b2);
-		tab1.add(b2);
+		backward = new JButton("後");
+		backward.addActionListener(this);
+		getContentPane().add(backward);
+		tab1.add(backward);
 		
 		
 		JPanel tab2 = new JPanel();//編集ページ
@@ -273,6 +281,20 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		} else if (s == mntmExit) {
 			dispose();
 		}
+		//こっから変更
+		else if(s == forward){
+			rb = new RuleBase(rules,wm);
+			rb.forwardChain();
+		}else if(s == backward){
+			rb = new RuleBase(rules,wm);
+			ArrayList<String> temptf = new ArrayList<String>();
+			String[] tf2 = tf.getText().split(",");
+			for(String str:tf2){
+				temptf.add(str);
+			}
+			rb.backwardChain(temptf);
+		}
+		
 	}
 
 
