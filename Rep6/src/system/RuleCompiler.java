@@ -99,7 +99,7 @@ public class RuleCompiler {
 		}
 	}
 	
-	public class RuleContainer {
+	public static class RuleContainer {
 		/** 開始位置 */
 		public int offset;
 		/** 長さ */

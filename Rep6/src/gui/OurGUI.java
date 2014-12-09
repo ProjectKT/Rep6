@@ -34,7 +34,7 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
-
+import components.DataFilter;
 import components.RuleTextPane;
 
 public class OurGUI extends JFrame implements ActionListener , ComponentListener, ChangeListener{
@@ -327,6 +327,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		Object s = e.getSource();
 		if (s == mntmOpenRuleFile) {
 			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.addChoosableFileFilter(new DataFilter());
 			int selected = fileChooser.showOpenDialog(this);
 			if (selected == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
@@ -334,6 +335,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			}
 		} else if (s == mntmOpenWMFile) {
 			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.addChoosableFileFilter(new DataFilter());
 			int selected = fileChooser.showOpenDialog(this);
 			if (selected == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
