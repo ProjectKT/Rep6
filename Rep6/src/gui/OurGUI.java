@@ -244,6 +244,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		
 		ruleTextPane = new RuleTextPane();
 		ruleTextPane.setCallbacks(ruleTextPaneCallbacks);
+		ruleTextPane.startAutoRuleCompiling(this);
 		
 		sp1 = new JScrollPane(ruleTextPane);
 		sp1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);

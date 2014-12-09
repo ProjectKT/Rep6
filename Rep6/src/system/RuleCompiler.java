@@ -89,9 +89,9 @@ public class RuleCompiler {
 	
 	
 	public class Result {
-		boolean succeeded = false;
-		ArrayList<RuleContainer> rules = new ArrayList<RuleContainer>();
-		ArrayList<Exception> errors = new ArrayList<Exception>();
+		public boolean succeeded = false;
+		public ArrayList<RuleContainer> rules = new ArrayList<RuleContainer>();
+		public ArrayList<Exception> errors = new ArrayList<Exception>();
 		
 		@Override
 		public String toString() {
