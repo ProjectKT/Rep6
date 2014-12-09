@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,11 +34,7 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
-<<<<<<< HEAD
 
-=======
->>>>>>> branch 'master' of https://github.com/ProjectKT/Rep6.git
-import components.HighlightedTextPane;
 import components.RuleTextPane;
 
 public class OurGUI extends JFrame implements ActionListener , ComponentListener, ChangeListener{
@@ -62,14 +59,14 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	JMenuItem mntmExit;
     RuleTextPane ruleTextPane;
     RuleTextPane ruleTextPane2;
-	JScrollPane sp;
-	JScrollPane sp2;
 	JButton forward;
 	JButton backward;
 	JTextField tf;
 	JTextField ansField;
 	JRadioButton ruleEdit;
 	JRadioButton wmEdit;
+	JScrollPane sp1;
+	JScrollPane sp2;
 
     
     /**
@@ -160,7 +157,8 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	}
 
 	private void set(){
-		
+
+		addComponentListener(this);
 
 		JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -196,39 +194,51 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		
 		
 		//--------編集ページ-------
+		
+		JPanel tab2 = new JPanel(new BorderLayout());
+		
+		JPanel radioPanel = new JPanel();
+		
 		ruleEdit = new JRadioButton("ルール",true);
 		ruleEdit.addChangeListener(this);
+		radioPanel.add(ruleEdit);
+
 		wmEdit = new JRadioButton("WM",false);
 		wmEdit.addChangeListener(this);
-		JPanel tab2 = new JPanel();
-		JPanel radioPanel = new JPanel();
+		radioPanel.add(wmEdit);
+
 		ButtonGroup group = new ButtonGroup();
 		group.add(ruleEdit);
 		group.add(wmEdit);
-		radioPanel.add(ruleEdit);
-		radioPanel.add(wmEdit);
-		tab2.add(radioPanel);
+		
+		tab2.add(radioPanel, BorderLayout.NORTH);
+		
 		ruleTextPane = new RuleTextPane();
 		ruleTextPane.setCallbacks(ruleTextPaneCallbacks);
-		sp = new JScrollPane(ruleTextPane);
-		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		sp.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
-		addComponentListener(this);
-		getContentPane().add(sp, BorderLayout.CENTER);
+		
+		sp1 = new JScrollPane(ruleTextPane);
+		sp1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		sp1.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
+		
 		ruleTextPane2 = new RuleTextPane();
 		ruleTextPane2.setCallbacks(ruleTextPaneCallbacks);
+		
 		sp2 = new JScrollPane(ruleTextPane2);
 		sp2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		//sp2.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
-		getContentPane().add(sp2, BorderLayout.CENTER);
-		tab2.add(sp);
-		sp.setVisible(true);
+		sp2.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
+		
+		JPanel editorPanel = new JPanel(new FlowLayout());
+		tab2.add(editorPanel, BorderLayout.CENTER);
+		
+		editorPanel.add(sp1);
+		sp1.setVisible(true);
+		editorPanel.add(sp2);
 		sp2.setVisible(false);
-		tab2.add(sp2);
+		
 		tabbedPane.addTab("編集",tab2);
 
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
-
+		pack();
 		
 	}
 	
@@ -353,7 +363,8 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	public void componentResized(ComponentEvent e) {
 		// TODO Auto-generated method stub
 		System.out.println("!!!");
-		sp.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
+		sp1.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
+		sp2.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 		setVisible(true);
 	}
 
@@ -377,12 +388,12 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		// TODO Auto-generated method stub
 		 if(ruleEdit.isSelected()) {
 			 sp2.setVisible(false);
-			 sp.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
-			 sp.setVisible(true);
-			 sp.getParent().revalidate();
+			 sp1.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
+			 sp1.setVisible(true);
+			 sp1.getParent().revalidate();
 		 }
         if(wmEdit.isSelected()) {
-        	 sp.setVisible(false);
+        	 sp1.setVisible(false);
 			 sp2.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 			 sp2.setVisible(true);
 			 sp2.getParent().revalidate();
