@@ -33,10 +33,7 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
-<<<<<<< HEAD
-
-=======
->>>>>>> branch 'master' of https://github.com/ProjectKT/Rep6.git
+import components.DataFilter;
 import components.HighlightedTextPane;
 import components.RuleTextPane;
 
@@ -317,6 +314,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		Object s = e.getSource();
 		if (s == mntmOpenRuleFile) {
 			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.addChoosableFileFilter(new DataFilter());
 			int selected = fileChooser.showOpenDialog(this);
 			if (selected == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
@@ -324,6 +322,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			}
 		} else if (s == mntmOpenWMFile) {
 			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.addChoosableFileFilter(new DataFilter());
 			int selected = fileChooser.showOpenDialog(this);
 			if (selected == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
