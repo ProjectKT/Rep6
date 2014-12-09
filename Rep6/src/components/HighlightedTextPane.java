@@ -76,17 +76,17 @@ public class HighlightedTextPane extends JTextPane {
 	/** DocumentListener */
 	private DocumentListener documentListener = new DocumentListener() {
 		@Override
-		public void removeUpdate(DocumentEvent e) {
+		public void insertUpdate(DocumentEvent e) {
 			try {
-				stylizeDocument(e.getOffset()+e.getLength()-1, e.getOffset());
+				stylizeDocument(e.getOffset(), e.getOffset()+e.getLength());
 			} catch (BadLocationException e1) {
 				e1.printStackTrace();
 			}
 		}
 		@Override
-		public void insertUpdate(DocumentEvent e) {
+		public void removeUpdate(DocumentEvent e) {
 			try {
-				stylizeDocument(e.getOffset(), e.getOffset()+e.getLength());
+				stylizeDocument(e.getOffset(), e.getOffset()-e.getLength());
 			} catch (BadLocationException e1) {
 				e1.printStackTrace();
 			}
@@ -235,8 +235,9 @@ public class HighlightedTextPane extends JTextPane {
 
 		int pos = at.getCurrentPosition();
 		System.out.println("stylizeDocument("+start+", "+end+"): min="+minPosition+", max="+maxPosition+", pos="+pos);
+		System.out.println((minPosition <= pos)+","+(pos <= maxPosition)+","+at.hasMoreTokens()+", "+at.getCurrentPosition());
 		while (minPosition <= pos && pos <= maxPosition && at.hasMoreElements()) {
-			String token = at.nextToken();
+			String token = at.nextToken(); System.out.println(token);
 			pos = at.getCurrentPosition();
 			if (-1 <= pos) {
 				AttributeSet attr = tokenHighlighter.getAttributeSetForToken(token);

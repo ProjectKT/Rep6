@@ -44,7 +44,9 @@ public class CharArrayTokenizer implements Enumeration<String> {
 	public CharArrayTokenizer reverse() {
 		reverse = !reverse;
 		newPosition = -1;
-		return from(reverse ? currentPosition-1 : currentPosition+1);
+		final int newCurrentPosition = reverse ? currentPosition-1 : currentPosition+1;
+		currentPosition = Math.min(Math.max(offset, newCurrentPosition), maxPosition);
+		return this;
 	}
 	
 	public int getCurrentPosition() {
