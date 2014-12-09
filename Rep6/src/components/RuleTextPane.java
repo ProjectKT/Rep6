@@ -3,19 +3,41 @@ package components;
 import java.awt.Color;
 import java.awt.ScrollPane;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import providers.OurSuffixArray;
-import providers.SuffixArray;
+import providers.Rule;
 import system.RuleCompiler;
 
-public class RuleTextPane extends HighlightedTextPane implements HighlightedTextPane.TokenHighlighter {
+public class RuleTextPane extends HighlightedTextPane implements HighlightedTextPane.TokenHighlighter, DocumentListener {
+	
+	/** コールバックのインタフェース定義 */
+	public interface Callbacks {
+		/** ルールが生成されたときに呼ばれる */
+		public void onRuleCreated(Rule rule);
+		/** ルールが削除された時に呼ばれる */
+		public void onRuleRemoved(Rule rule);
+		/** SuffixArray から Suggestion を取得するときに呼ばれる */
+		public List<String> getSuggestions(String input);
+	}
+	
+	protected static final Callbacks sDummyCallbacks = new Callbacks() {
+		@Override
+		public void onRuleCreated(Rule rule) { }
+		@Override
+		public void onRuleRemoved(Rule rule) { }
+		@Override
+		public List<String> getSuggestions(String input) { return null; }
+	};
+	
+	/** コールバック */
+	private Callbacks callbacks = sDummyCallbacks;
 	
 	/**
 	 * RuleTextPane で用いる AttributeSet
@@ -53,8 +75,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		put("then", RuleAttributeSet.thenClause);
 	}};
 	
-	/** SuffixArray */
-	private SuffixArray suffixArray = new OurSuffixArray();
+	/** SyntaxChecker */
 	private RuleCompiler compiler = new RuleCompiler();
 	
 
@@ -62,6 +83,20 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		super();
 		setTokenHighlighter(this);
 		setUI(new RuleTextPane.UI());
+	}
+	
+	public RuleTextPane(String text) {
+		super(text);
+		setTokenHighlighter(this);
+		setUI(new RuleTextPane.UI());
+	}
+	
+	/**
+	 * コールバックを設定する
+	 * @param callbacks コールバックインターフェースの実装
+	 */
+	public void setCallbacks(Callbacks callbacks) {
+		this.callbacks = (callbacks == null) ? sDummyCallbacks : callbacks;
 	}
 	
 	/**
@@ -72,24 +107,20 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		return attributeSetMap.get(token.toLowerCase());
 	}
 	
-//	@Override
-//	public void insertUpdate(DocumentEvent e) {
-//		super.insertUpdate(e);
+	@Override
+	public void insertUpdate(DocumentEvent e) {
 //		traverseRules(0); // FIXME
 //		updateSuggestions();
-//	}
-//
-//	@Override
-//	public void removeUpdate(DocumentEvent e) {
-//		super.removeUpdate(e);
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent e) {
 //		traverseRules(0); // FIXME
 //		updateSuggestions();
-//	}
+	}
 	
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-		super.changedUpdate(e);
-		
 		System.out.println(compiler.compile(getText()));
 	}
 	
@@ -99,18 +130,6 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 	 */
 	private void traverseRules(int startPos) {
 		// TODO implement this method
-	}
-
-	/**
-	 * SuffixArray を使って Suggestions を更新する
-	 */
-	private void updateSuggestions() {
-		String token = getLastEditedToken();
-		System.out.println(" --- "+token+" --- ");
-		Iterator<String> sentences = suffixArray.getAllSentences(token);
-		while (sentences.hasNext()) {
-			System.out.println(sentences.next());
-		}
 	}
 
 	/**

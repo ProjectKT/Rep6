@@ -35,6 +35,9 @@ public class RuleCompiler {
 								antecedents = new ArrayList<String>();
 								safeNextToken();
 								while (!"then".equalsIgnoreCase(st.sval)) {
+									if ("rule".equalsIgnoreCase(st.sval) || "if".equalsIgnoreCase(st.sval)) {
+										throw new IllegalEndException(st.getCurrentPosition() - st.sval.length() - 1);
+									}
 									antecedents.add(st.sval);
 									safeNextToken();
 								}
@@ -59,6 +62,7 @@ public class RuleCompiler {
 					}
 				} catch (Exception e) {
 					hasError = true;
+					result.errors.add(e);
 					System.out.println(e);
 				}
 			}
@@ -78,7 +82,7 @@ public class RuleCompiler {
 	private int safeNextToken() throws IllegalEndException, IOException {
 		int i = st.nextToken();
 		if (i == StreamTokenizer.TT_EOF) {
-			throw new IllegalEndException();
+			throw new IllegalEndException(st.getCurrentPosition() - 1);
 		}
 		return i;
 	}
@@ -87,6 +91,7 @@ public class RuleCompiler {
 	public class Result {
 		boolean succeeded = false;
 		ArrayList<RuleContainer> rules = new ArrayList<RuleContainer>();
+		ArrayList<Exception> errors = new ArrayList<Exception>();
 		
 		@Override
 		public String toString() {
@@ -114,18 +119,26 @@ public class RuleCompiler {
 		}
 	}
 	
-	public class UnknownTokenException extends RuntimeException {
+	public class UnknownTokenException extends Exception {
+		public int type;
 		public UnknownTokenException(int n) {
 			super(String.valueOf(n));
+			this.type = n;
 		}
 	}
-	public class IllegalTokenException extends RuntimeException {
+	public class IllegalTokenException extends Exception {
+		public String token;
 		public IllegalTokenException(String s) {
 			super(s);
+			this.token = s;
 		}
 	}
-	public class IllegalEndException extends RuntimeException {
-		
+	public class IllegalEndException extends Exception {
+		public int offset;
+		public IllegalEndException(int offset) {
+			super(String.valueOf(offset));
+			this.offset = offset;
+		}
 	}
 	
 	public static void main(String[] args) {
