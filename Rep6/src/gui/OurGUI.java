@@ -114,7 +114,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	// 初期化
 	private void initialize() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(10,10,1000,800);
+		setBounds(10,10,500,800);
 		setTitle("gui");
 		
 		/* --- MENU --- */
