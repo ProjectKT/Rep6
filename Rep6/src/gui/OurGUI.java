@@ -9,9 +9,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -39,23 +42,26 @@ import components.RuleTextPane;
 
 public class OurGUI extends JFrame implements ActionListener , ComponentListener, ChangeListener{
 
-	private static final String[] RULE_FILES = {"AnimalWorld.data","CarShop.data"};
-	private static final String[] WM_FILES = {"AnimalWorldWm.data","CarShopWm.data"};
+	private String currentRuleFileName = "AnimalWorld.data";
+	private String currentWmFileName = "AnimalWorldWm.data";
 	
 	// --- ロジックのメンバ ---
 	String data="data";
 	String text;
-	OurSuffixArray osa = new OurSuffixArray();
+	OurSuffixArray osa;
 	static FileManager fm;
-	ArrayList<Rule> rules = new ArrayList<Rule>();
-	ArrayList<String> wm = new ArrayList<String>();
-
+	ArrayList<Rule> rules;
+	ArrayList<String> wm;
 	RuleBase rb;
 	
 	
 	// --- ビューのメンバ ---
 	JMenuItem mntmOpenRuleFile;
 	JMenuItem mntmOpenWMFile;
+	JMenuItem mntmSaveRuleFile;
+	JMenuItem mntmSaveWMFile;
+	JMenuItem mntmSaveAsRuleFile;
+	JMenuItem mntmSaveAsWMFile;
 	JMenuItem mntmExit;
     RuleTextPane ruleTextPane;
     RuleTextPane ruleTextPane2;
@@ -149,6 +155,28 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		mntmOpenWMFile.addActionListener(this);
 		mnFile.add(mntmOpenWMFile);
 		
+		mnFile.addSeparator();
+		
+		mntmSaveRuleFile = new JMenuItem("Save Rule File");
+		mntmSaveRuleFile.addActionListener(this);
+		mnFile.add(mntmSaveRuleFile);
+
+		mntmSaveWMFile = new JMenuItem("Save WM File");
+		mntmSaveWMFile.addActionListener(this);
+		mnFile.add(mntmSaveWMFile);
+		
+		mnFile.addSeparator();
+		
+		mntmSaveAsRuleFile = new JMenuItem("Save As Rule File");
+		mntmSaveAsRuleFile.addActionListener(this);
+		mnFile.add(mntmSaveAsRuleFile);
+
+		mntmSaveAsWMFile = new JMenuItem("Save As WM File");
+		mntmSaveAsWMFile.addActionListener(this);
+		mnFile.add(mntmSaveAsWMFile);
+		
+		mnFile.addSeparator();
+		
 		mntmExit = new JMenuItem("Exit");
 		mntmExit.addActionListener(this);
 		mnFile.add(mntmExit);
@@ -240,7 +268,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		pack();
-		
+		setupTextPane();
 	}
 	
 	
@@ -255,20 +283,40 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	private void loadData() {
 		fm = new FileManager();
 		// ファイルから読み込む
-		for (String filename : RULE_FILES) {
-				rules.addAll(fm.loadRules(filename));
-		}
-		for (String filename : WM_FILES) {
-				wm.addAll(fm.loadWm(filename));
-		}
+		rules = new ArrayList<Rule>();
+				rules.addAll(fm.loadRules(currentRuleFileName));
+				wm = new ArrayList<String>();
+				wm.addAll(fm.loadWm(currentWmFileName));
 	}
 	
 	private void setupSuffixArray(){
+		osa = new OurSuffixArray();
 		for(int i = 0; i < rules.size(); i++){
 			osa.addSuffixRule(rules.get(i));
 		}
 		for(int i2 = 0; i2 < wm.size(); i2++){
 			osa.addSuffixWm(wm.get(i2));
+		}
+	}
+	
+	private void setupTextPane(){
+		File file = new File(currentRuleFileName);
+		String text;
+		try {
+			text = readFile(file);
+			ruleTextPane.setText(text);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		file = new File(currentWmFileName);
+		try {
+			text = readFile(file);
+			ruleTextPane2.setText(text);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -280,6 +328,12 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		try {
 			String text = readFile(file);
 			ruleTextPane.setText(text);
+			
+			//ここからバックアップの保存
+			File backup = new File(file.getPath().substring(0,file.getPath().length()-5)+"_BackUp.data");
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(backup)));
+			pw.println(text);
+			pw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -290,10 +344,15 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	 * @param file
 	 */
 	private void loadWMFile(File file) {
-		// FIXME
 		try {
 			String text = readFile(file);
 			ruleTextPane2.setText(text);
+			
+			//ここからバックアップの保存
+			File backup = new File(file.getPath().substring(0,file.getPath().length()-5)+"_BackUp.data");
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(backup)));
+			pw.println(text);
+			pw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -322,6 +381,39 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		}
 		return sb.toString();
 	}
+	
+	/**
+	 * RuleTextPaneからルールをとってきて元のファイルに保存する
+	 * @param file_name
+	 */
+	private void saveRuleFile(String filename) {
+		try {
+			//ここまで普通の保存
+			String text = ruleTextPane.getText();
+			File file = new File(filename);
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+			pw.println(text);
+			 pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * RuleTextPaneからルールをとってきて元のファイルに保存する
+	 * @param file_name
+	 */
+	private void saveWmFile(String filename) {
+		try {
+			String text = ruleTextPane2.getText();
+			File file = new File(filename);
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+			pw.println(text);
+			 pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -333,6 +425,9 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			if (selected == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
 				loadRuleFile(file);
+				currentRuleFileName = file.getName();
+				loadData();
+				setupSuffixArray();
 			}
 		} else if (s == mntmOpenWMFile) {
 			JFileChooser fileChooser = new JFileChooser();
@@ -341,12 +436,13 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			if (selected == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
 				loadWMFile(file);
+				currentWmFileName = file.getName();
+				loadData();
+				setupSuffixArray();
 			}
 		} else if (s == mntmExit) {
 			dispose();
-		}
-		//こっから変更
-		else if(s == forward){
+		}else if(s == forward){
 			rb = new RuleBase(rules,wm);
 			rb.forwardChain();
 		}else if(s == backward){
@@ -357,6 +453,14 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 				temptf.add(str);
 			}
 			rb.backwardChain(temptf);
+		}else if(s == mntmSaveRuleFile){
+			saveRuleFile(currentRuleFileName);
+		}else if(s == mntmSaveWMFile){
+			saveWmFile(currentWmFileName);
+		}else if(s == mntmSaveAsRuleFile){
+			
+		}else if(s == mntmSaveAsWMFile){
+			
 		}
 		
 	}
