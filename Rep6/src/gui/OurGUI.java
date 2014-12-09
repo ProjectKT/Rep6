@@ -53,6 +53,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	ArrayList<Rule> rules;
 	ArrayList<String> wm;
 	RuleBase rb;
+	File currentDirectory = null;
 	
 	
 	// --- ビューのメンバ ---
@@ -326,6 +327,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	private void loadRuleFile(File file) {
 		try {
 			String text = readFile(file);
+			currentDirectory = file.getParentFile();
 			ruleTextPane.setText(text);
 			
 			//ここからバックアップの保存
@@ -345,6 +347,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	private void loadWMFile(File file) {
 		try {
 			String text = readFile(file);
+			currentDirectory = file.getParentFile();
 			ruleTextPane2.setText(text);
 			
 			//ここからバックアップの保存
@@ -420,6 +423,8 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		if (s == mntmOpenRuleFile) {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.addChoosableFileFilter(new DataFilter());
+			fileChooser.setCurrentDirectory(currentDirectory);
+			fileChooser.setDialogTitle("OpenRuleFile");
 			int selected = fileChooser.showOpenDialog(this);
 			if (selected == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
@@ -431,6 +436,8 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		} else if (s == mntmOpenWMFile) {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.addChoosableFileFilter(new DataFilter());
+			fileChooser.setCurrentDirectory(currentDirectory);
+			fileChooser.setDialogTitle("OpenWmFile");
 			int selected = fileChooser.showOpenDialog(this);
 			if (selected == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
@@ -457,9 +464,28 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		}else if(s == mntmSaveWMFile){
 			saveWmFile(currentWmFileName);
 		}else if(s == mntmSaveAsRuleFile){
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.addChoosableFileFilter(new DataFilter());
+			fileChooser.setCurrentDirectory(currentDirectory);
+			fileChooser.setDialogTitle("SaveAsRuleFile");
+			int selected = fileChooser.showOpenDialog(this);
+			if (selected == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				currentDirectory = file.getParentFile();
+				saveRuleFile(file.getName());
+			}
 			
 		}else if(s == mntmSaveAsWMFile){
-			
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.addChoosableFileFilter(new DataFilter());
+			fileChooser.setCurrentDirectory(currentDirectory);
+			fileChooser.setDialogTitle("SaveAsWmRuleFile");
+			int selected = fileChooser.showOpenDialog(this);
+			if (selected == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				currentDirectory = file.getParentFile();
+				saveRuleFile(file.getName());
+			}
 		}
 		
 	}

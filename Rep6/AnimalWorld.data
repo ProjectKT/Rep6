@@ -11,9 +11,9 @@ if	"?x has feathers"
 then 	"?x is a bird"
 
 rule 	"Z4"
-if      "?x flies"	
+if	"?x flies"	
 	"?x lays eggs"
-then    "?x is bird"
+then	"?x is bird"
 
 rule	"Z5"
 if	"?x is a mammal"   	
@@ -82,5 +82,6 @@ rule 	"Z15"
 if 	"?x is a bird"
 	"?x is a good flyer"
 then	"?x is an albatross"
+
 
 
