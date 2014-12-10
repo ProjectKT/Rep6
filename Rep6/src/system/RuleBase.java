@@ -156,7 +156,7 @@ import providers.*;
 			// 先頭が ? なら変数
 			return str1.startsWith("?");
 		}
-
+/*
 		private void loadRules(String theFileName) {
 			String line;
 			try {
@@ -203,6 +203,9 @@ import providers.*;
 				System.out.println(((Rule) rules.get(i)).toString());
 			}
 		}
+		
+		*/
+		
 		/**
 			後ろ向き推論
 		**/
@@ -362,7 +365,7 @@ import providers.*;
 			return newRule;
 		}
 		
-		
+		/*
 		private ArrayList<String> getVars(String thePattern, ArrayList<String> vars) {
 			StringTokenizer st = new StringTokenizer(thePattern);
 			for (int i = 0; i < st.countTokens();) {
@@ -399,7 +402,7 @@ import providers.*;
 			}
 			return result.trim();
 		}
-		
+		*/
 		
 	}
 	
