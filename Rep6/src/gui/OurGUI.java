@@ -78,7 +78,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	JScrollPane sp1;
 	JScrollPane sp2;
 	JScrollPane sp3;
-	JPanel tab1 = new JPanel();
+	JPanel tab1 = new JPanel(new BorderLayout());
 	JPanel tab2 = new JPanel(new BorderLayout());
 	JPanel radioPanel = new JPanel();
 	JPanel p1;
