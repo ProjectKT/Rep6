@@ -40,7 +40,7 @@ public class OurSuffixArray extends SuffixArray{
 	public static void main(String[] args) {
 		OurSuffixArray osa = new OurSuffixArray();
 		
-		Iterator it = osa.getAllSentences("has");
+		Iterator it = osa.getCorrectSentencesHard("?x is re");
 		while(it.hasNext()){
 			System.out.println(it.next());
 		}

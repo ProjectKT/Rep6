@@ -82,6 +82,3 @@ rule 	"Z15"
 if 	"?x is a bird"
 	"?x is a good flyer"
 then	"?x is an albatross"
-
-
-
