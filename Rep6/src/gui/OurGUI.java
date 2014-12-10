@@ -78,7 +78,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	JScrollPane sp1;
 	JScrollPane sp2;
 	JScrollPane sp3;
-	JPanel tab1 = new JPanel();
+	JPanel tab1 = new JPanel(new BorderLayout());
 	JPanel tab2 = new JPanel(new BorderLayout());
 	JPanel radioPanel = new JPanel();
 	JPanel p1;
@@ -206,8 +206,9 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		tab1.add(backward);
 		
 		//解の表示欄
-		aa = new JTextArea("");
+		aa = new JTextArea();
 		getContentPane().add(aa);
+		tab1.add(aa);
 		
 		p1 = new JPanel();
 		p1.setLayout(new FlowLayout());
