@@ -206,8 +206,9 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		tab1.add(backward);
 		
 		//解の表示欄
-		aa = new JTextArea("");
+		aa = new JTextArea();
 		getContentPane().add(aa);
+		tab1.add(aa);
 		
 		p1 = new JPanel();
 		p1.setLayout(new FlowLayout());
