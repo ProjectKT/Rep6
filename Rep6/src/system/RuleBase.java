@@ -113,11 +113,6 @@ import providers.*;
 			System.out.println("No rule produces a new assertion");
 			text += "No rule produces a new assertion"+"\n";
 		}
-
-		public String get_answer(){
-			return text;
-		}
-		
 		
 		/**
 		 * 前向き推論の答えを返す
