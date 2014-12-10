@@ -3,7 +3,9 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -29,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -37,7 +40,6 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
-
 import components.DataFilter;
 import components.RuleTextPane;
 
@@ -70,11 +72,16 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	JButton forward;
 	JButton backward;
 	JTextField tf;
-	JTextField ansField;
+	JTextArea aa;
 	JRadioButton ruleEdit;
 	JRadioButton wmEdit;
 	JScrollPane sp1;
 	JScrollPane sp2;
+	JPanel tab1 = new JPanel();
+	JPanel tab2 = new JPanel(new BorderLayout());
+	JPanel radioPanel = new JPanel();
+	JPanel p1;
+	JPanel p2;
 
     
     /**
@@ -159,6 +166,19 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		/* --- content --- */
 	}
 
+    GridBagLayout gbl = new GridBagLayout();
+
+    void addPanel(JPanel p, int x, int y, int w, int h) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.gridwidth = w;
+        gbc.gridheight = h;
+        gbl.setConstraints(p, gbc);
+        tab1.add(p);
+    }
+    
 	private void set(){
 
 		addComponentListener(this);
@@ -166,11 +186,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		JTabbedPane tabbedPane = new JTabbedPane();
 
 		//------質問ページ-------
-		JPanel tab1 = new JPanel();
-		tabbedPane.addTab("質問",tab1);
-		
-		GridBagLayout gbl = new GridBagLayout();
-		
+		tabbedPane.addTab("質問",tab1);		
 		
 		tf = new JTextField("",20);
 		getContentPane().add(tf);
@@ -189,18 +205,26 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		tab1.add(backward);
 		
 		//解の表示欄
-		ansField = new JTextField("");
-		getContentPane().add(ansField);
-		tab1.add(ansField);
+		aa = new JTextArea("",40,40);
+		getContentPane().add(aa);
+		tab1.add(aa);
 		
-
+		p1 = new JPanel();
+		p1.setLayout(new FlowLayout());
+		p1.add(tf);
+		p1.add(forward);
+		p1.add(backward);
+		
+		p2 = new JPanel();
+		p2.add(aa);
+		
+		tab1.setLayout(gbl);
+		addPanel(p1,0,0,1,1);
+		addPanel(p2,0,1,1,1);
 		
 		
 		//--------編集ページ-------
-		
-		JPanel tab2 = new JPanel(new BorderLayout());
-		
-		JPanel radioPanel = new JPanel();
+		tabbedPane.addTab("編集",tab2);
 		
 		ruleEdit = new JRadioButton("ルール",true);
 		ruleEdit.addChangeListener(this);
@@ -239,8 +263,6 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		editorPanel.add(sp2);
 		sp2.setVisible(false);
 		
-		tabbedPane.addTab("編集",tab2);
-
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		pack();
 		setupTextPane();
