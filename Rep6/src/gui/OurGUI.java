@@ -77,6 +77,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	JRadioButton wmEdit;
 	JScrollPane sp1;
 	JScrollPane sp2;
+	JScrollPane sp3;
 	JPanel tab1 = new JPanel();
 	JPanel tab2 = new JPanel(new BorderLayout());
 	JPanel radioPanel = new JPanel();
@@ -205,9 +206,8 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		tab1.add(backward);
 		
 		//解の表示欄
-		aa = new JTextArea("",40,40);
+		aa = new JTextArea("");
 		getContentPane().add(aa);
-		tab1.add(aa);
 		
 		p1 = new JPanel();
 		p1.setLayout(new FlowLayout());
@@ -215,13 +215,21 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		p1.add(forward);
 		p1.add(backward);
 		
-		p2 = new JPanel();
-		p2.add(aa);
+		sp3 = new JScrollPane(aa);
+		sp3.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		sp3.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 		
-		tab1.setLayout(gbl);
-		addPanel(p1,0,0,1,1);
-		addPanel(p2,0,1,1,1);
+		p2 = new JPanel(new FlowLayout());
+		p2.add(sp3);
 		
+		tab1.add(p1,BorderLayout.NORTH);
+		tab1.add(p2,BorderLayout.CENTER);
+		
+		//tab1.setLayout(gbl);
+		//addPanel(p1,0,0,1,1);
+		//addPanel(p2,0,1,1,1);
+		
+
 		
 		//--------編集ページ-------
 		tabbedPane.addTab("編集",tab2);
@@ -478,6 +486,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		System.out.println("!!!");
 		sp1.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 		sp2.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
+		sp3.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 		setVisible(true);
 	}
 
