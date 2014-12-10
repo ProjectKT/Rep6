@@ -1,6 +1,7 @@
 package providers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,18 +36,19 @@ public class SuffixArray {
 			existsentences.remove(sentence);
 		}
 		existsentences.put(sentence, x);
-		
+
 	}
-	
+
 	/**
 	 * 文の存在を消すメソッド
+	 * 
 	 * @param sentence
 	 */
-	private void removeExistSentenceList(String sentence){
+	private void removeExistSentenceList(String sentence) {
 		int x = existsentences.get(sentence);
 		existsentences.remove(sentence);
-		if(x>1){
-			existsentences.put(sentence,x-1);
+		if (x > 1) {
+			existsentences.put(sentence, x - 1);
 		}
 	}
 
@@ -212,6 +214,79 @@ public class SuffixArray {
 	}
 
 	/**
+	 * 受け取った文から予想される本当に打ちたかったと思われる文を返す 「?x i re」のような文にたいし「?x is red」を返すイメージ
+	 * 可能性がかなり高いものを返す
+	 * @param sentence
+	 * @return
+	 */
+	public Iterator<String> getCorrectSentencesHard(String sentence) {
+		TreeSet<String> returnsentences = new TreeSet<String>();
+		TreeSet<String> checksentences = new TreeSet<String>();
+		// 初回どうか判別
+		boolean firstflag = true;
+		String[] words = sentence.split(" ");
+		for (String word : words) {
+			System.out.println(word+"!");
+			// ?xの部分は無視
+			if (!word.contains("?")) {
+				checksentences.clear();
+
+				Iterator<String> it2 = getAllSentences(word);
+				while (it2.hasNext()) {
+					checksentences.add(it2.next());
+				}
+				// 初回はチェックセンテンスをそのままreturnsentencesに格納
+				if (firstflag) {
+					Iterator<String> it3 = checksentences.iterator();
+					while (it3.hasNext()) {
+						returnsentences.add(it3.next());
+					}
+					firstflag = false;
+				} else {
+					// 二回目以降はリターンセンテンスからチェックセンテンスにないものは除外
+					Iterator<String> it4 = returnsentences.iterator();
+					while (it4.hasNext()) {
+						String check = it4.next();
+						//System.out.println(check);
+						if (!checksentences.contains(check)){
+							it4.remove();
+							System.out.println(check+"!$!!");
+						}else{
+							System.out.println(check+"!@!!");
+						}
+					}
+
+				}
+			}
+		}
+
+		return returnsentences.iterator();
+	}
+
+	/**
+	 * 受け取った文から予想される本当に打ちたかったと思われる文を返す 「?x i re」のような文にたいし「?x is red」を返すイメージ
+	 * 可能性が少しでもあるものを返す
+	 * @param sentence
+	 * @return
+	 */
+	public Iterator<String> getCorrectSentencesSoft(String sentence) {
+		TreeSet<String> returnsentences = new TreeSet<String>();
+		Iterator<String> it;
+		String[] words = sentence.split(" ");
+		for (String word : words) {
+			// ?xの部分は無視
+			if (!word.contains("?")) {
+				it = getAllSentences(word);
+				while (it.hasNext()) {
+					returnsentences.add(it.next());
+				}
+			}
+		}
+
+		return returnsentences.iterator();
+	}
+
+	/**
 	 * 受け取ったsuffixを含む文を全て返す(処理が軽いはず)
 	 * 
 	 * @param suffix
@@ -247,16 +322,16 @@ public class SuffixArray {
 			}
 		}
 		Iterator<String> it3 = sentences.iterator();
-		while(it3.hasNext()){
+		while (it3.hasNext()) {
 			sentence = it3.next();
-			if(!existsentences.containsKey(sentence))
+			if (!existsentences.containsKey(sentence))
 				sentences.remove(sentence);
 		}
-			
+
 		return sentences.iterator();
 
 	}
-	
+
 	/**
 	 * 受け取ったsuffixを含む単語を返す
 	 * 
