@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -40,7 +39,9 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
+
 import components.DataFilter;
+import components.HighlightedTextPane;
 import components.RuleTextPane;
 
 public class OurGUI extends JFrame implements ActionListener , ComponentListener, ChangeListener{
@@ -68,7 +69,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	JMenuItem mntmSaveAsWMFile;
 	JMenuItem mntmExit;
     RuleTextPane ruleTextPane;
-    RuleTextPane ruleTextPane2;
+    HighlightedTextPane wmTextPane;
 	JButton forward;
 	JButton backward;
 	JTextField tf;
@@ -257,10 +258,9 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		sp1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		sp1.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 		
-		ruleTextPane2 = new RuleTextPane();
-		ruleTextPane2.setCallbacks(ruleTextPaneCallbacks);
+		wmTextPane = new RuleTextPane();
 		
-		sp2 = new JScrollPane(ruleTextPane2);
+		sp2 = new JScrollPane(wmTextPane);
 		sp2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		sp2.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 		
@@ -341,7 +341,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		try {
 			String text = readFile(file);
 			currentDirectory = file.getParentFile();
-			ruleTextPane2.setText(text);
+			wmTextPane.setText(text);
 			
 			//ここからバックアップの保存
 			File backup = new File(file.getPath().substring(0,file.getPath().length()-5)+"_BackUp.data");
@@ -400,7 +400,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	 */
 	private void saveWmFile(String filename) {
 		try {
-			String text = ruleTextPane2.getText();
+			String text = wmTextPane.getText();
 			File file = new File(filename);
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 			pw.println(text);

@@ -2,7 +2,6 @@ package components;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.List;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -14,24 +13,20 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Caret;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
@@ -112,7 +107,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 				while (true) {
 					consume(ruleCompileQueue.take());
 				}
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) { System.out.println(e); }
 		}
 		private void consume(RuleCompileRequest request) {
 			Result result = compiler.compile(getText()); System.out.println(result);
@@ -192,7 +187,9 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 			public void windowClosing(WindowEvent e) {
 				ruleCompileThread.interrupt();
 				try {
+					System.out.println("joining ruleCompileThread");
 					ruleCompileThread.join();
+					System.out.println("joined ruleCompileThread");
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				} finally {
