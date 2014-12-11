@@ -101,16 +101,8 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		}
 		
 		@Override
-		public Iterator<String> getWordSuggestions(String input) {
-			System.out.println(input);
-			String[] words = input.split(" ");
-			return osa.getWords(words[words.length-1]);
-		}
-		
-		@Override
-		public Iterator<String> getSentenceSuggestions(String input) {
-			System.out.println(input);
-			return osa.getCorrectSentencesHard(input);
+		public Iterator<String> getSuggestions(String input) {
+			return osa.getAllSentences(input);
 		}
 	};
     
