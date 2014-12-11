@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -40,13 +39,15 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
+
 import components.DataFilter;
+import components.HighlightedTextPane;
 import components.RuleTextPane;
 
 public class OurGUI extends JFrame implements ActionListener , ComponentListener, ChangeListener{
 
-	private String currentRuleFileName = "AnimalWorld.data";
-	private String currentWmFileName = "AnimalWorldWm.data";
+	private String currentRuleFileName = "CarShop.data";
+	private String currentWmFileName = "CarShopWm.data";
 	
 	// --- ロジックのメンバ ---
 	String data="data";
@@ -68,7 +69,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	JMenuItem mntmSaveAsWMFile;
 	JMenuItem mntmExit;
     RuleTextPane ruleTextPane;
-    RuleTextPane ruleTextPane2;
+    HighlightedTextPane wmTextPane;
 	JButton forward;
 	JButton backward;
 	JTextField tf;
@@ -99,9 +100,16 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			osa.deleteSuffixRule(rule.getName());
 		}
 		
+		public Iterator<String> getWordSuggestions(String input) {
+			System.out.println(input);
+			String[] words = input.split(" ");
+			return osa.getWords(words[words.length-1]);
+		}
+		
 		@Override
-		public Iterator<String> getSuggestions(String input) {
-			return osa.getAllSentences(input);
+		public Iterator<String> getSentenceSuggestions(String input) {
+			System.out.println(input);
+			return osa.getCorrectSentencesHard(input);
 		}
 	};
     
@@ -257,10 +265,9 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		sp1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		sp1.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 		
-		ruleTextPane2 = new RuleTextPane();
-		ruleTextPane2.setCallbacks(ruleTextPaneCallbacks);
+		wmTextPane = new RuleTextPane();
 		
-		sp2 = new JScrollPane(ruleTextPane2);
+		sp2 = new JScrollPane(wmTextPane);
 		sp2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		sp2.setPreferredSize(new Dimension(getWidth()-50, getHeight()-150));
 		
@@ -341,7 +348,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		try {
 			String text = readFile(file);
 			currentDirectory = file.getParentFile();
-			ruleTextPane2.setText(text);
+			wmTextPane.setText(text);
 			
 			//ここからバックアップの保存
 			File backup = new File(file.getPath().substring(0,file.getPath().length()-5)+"_BackUp.data");
@@ -400,7 +407,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	 */
 	private void saveWmFile(String filename) {
 		try {
-			String text = ruleTextPane2.getText();
+			String text = wmTextPane.getText();
 			File file = new File(filename);
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 			pw.println(text);
@@ -444,6 +451,12 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		} else if (s == forward) {
 			rb = new RuleBase(rules, wm);
 			rb.forwardChain();
+			String ans="新しいルールが生成されました\n--------------------\n";
+			for(String str:rb.getForwardAnswer()){
+				ans += str + "\n";
+			}
+				aa.setText(ans);
+			
 		} else if (s == backward) {
 			rb = new RuleBase(rules, wm);
 			ArrayList<String> temptf = new ArrayList<String>();
@@ -452,6 +465,12 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 				temptf.add(str);
 			}
 			rb.backwardChain(temptf);
+			String ans="";
+			for(String str:rb.getBackwardAnswer()){
+				ans += str + "\n";
+			}
+				aa.setText(ans);
+			
 		} else if (s == mntmSaveRuleFile) {
 			saveRuleFile(currentRuleFileName);
 		} else if (s == mntmSaveWMFile) {

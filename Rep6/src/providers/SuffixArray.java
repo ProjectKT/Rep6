@@ -226,9 +226,8 @@ public class SuffixArray {
 		boolean firstflag = true;
 		String[] words = sentence.split(" ");
 		for (String word : words) {
-			System.out.println(word+"!");
-			// ?xの部分は無視
-			if (!word.contains("?")) {
+			//　ifなどの部分は無視
+			if (!(word.contains("rule") || word.contains("if") || word.contains("then"))) {
 				checksentences.clear();
 
 				Iterator<String> it2 = getAllSentences(word);
@@ -250,9 +249,7 @@ public class SuffixArray {
 						//System.out.println(check);
 						if (!checksentences.contains(check)){
 							it4.remove();
-							System.out.println(check+"!$!!");
 						}else{
-							System.out.println(check+"!@!!");
 						}
 					}
 

@@ -56,6 +56,7 @@ public class HighlightedTextPane extends JTextPane {
 	private CustomDocument document;
 	/** TokenHighlighter */
 	private char[] delimiters = new char[]{' ','\n','\r','\t','\f'};
+	private char[] delimiters2 = new char[]{'\n'};
 	private TokenHighlighter tokenHighlighter = sDummyTokenHighlighter;
 	/** default attribute set applied to tokens  when null AttributeSet is returned from {@link HighlightedTextPane#TokenHighlighter} */
 	private MutableAttributeSet defaultAttributeSet = new SimpleAttributeSet();
@@ -257,9 +258,22 @@ public class HighlightedTextPane extends JTextPane {
 	 * 最後に編集したトークンを返す
 	 * @return
 	 */
+	
 	protected String getLastEditedToken() {
 		try {
 			return document.getTokenizer().from(getCaretPosition()).reverse().nextToken();
+		} catch (NoSuchElementException | BadLocationException e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * 最後に編集した行を返す
+	 * @return
+	 */
+	protected String getLastEditedLine() {
+		try {
+			return document.getLiner().from(getCaretPosition()).reverse().nextToken();
 		} catch (NoSuchElementException | BadLocationException e) {
 			return null;
 		}
@@ -293,7 +307,22 @@ public class HighlightedTextPane extends JTextPane {
 						.offset(txt.offset)
 						.limit(txt.count);
 		}
+		
+		/**
+		 * CharArrayTokenizer を返す
+		 * @return
+		 * @throws BadLocationException 
+		 */
+		public CharArrayTokenizer getLiner() throws BadLocationException {
+			Segment txt = new Segment();
+			getText(0, getLength(), txt);
+//			System.out.println("getTokenizer(): (len="+getLength()+"), "+txt+", offset="+txt.offset+", count="+txt.count);
+			return new CharArrayTokenizer(txt.array, delimiters2)
+						.offset(txt.offset)
+						.limit(txt.count);
+		}
 	}
+	
 	
 	/**
 	 * A customized UndoManager
