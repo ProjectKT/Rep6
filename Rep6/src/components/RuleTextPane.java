@@ -1,5 +1,6 @@
 package components;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.List;
@@ -23,6 +24,7 @@ import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
@@ -81,8 +83,10 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		public void onRuleCreated(Rule rule);
 		/** ルールが削除された時に呼ばれる */
 		public void onRuleRemoved(Rule rule);
-		/** SuffixArray から Suggestion を取得するときに呼ばれる */
-		public Iterator<String> getSuggestions(String input);
+		/** SuffixArray から単語の Suggestion を取得するときに呼ばれる */
+		public Iterator<String> getWordSuggestions(String input);
+		/** SuffixArray から文の Suggestion を取得するときに呼ばれる */
+		public Iterator<String> getSentenceSuggestions(String input);
 	}
 	
 	protected static final Callbacks sDummyCallbacks = new Callbacks() {
@@ -91,7 +95,9 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		@Override
 		public void onRuleRemoved(Rule rule) { }
 		@Override
-		public Iterator<String> getSuggestions(String input) { return null; }
+		public Iterator<String> getWordSuggestions(String input) { return null; }
+		@Override
+		public Iterator<String> getSentenceSuggestions(String input) { return null; }
 	};
 	
 	/** コールバック */
@@ -153,7 +159,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 			case KeyEvent.VK_SPACE:
 				if (e.isControlDown() || e.isMetaDown()) {
 					e.consume();
-					showSuggestions(getLastEditedToken());
+					showSuggestions(getLastEditedLine());
 				}
 				break;
 			}
@@ -227,7 +233,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 			ruleCompileQueue.add(request);
 		}
 		if (e.getLength() == 1) {
-			showSuggestions(getLastEditedToken());
+			showSuggestions(getLastEditedLine());
 		}
 	}
 
@@ -242,7 +248,7 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 			ruleCompileQueue.add(request);
 		}
 		if (e.getLength() == 1) {
-			showSuggestions(getLastEditedToken());
+			showSuggestions(getLastEditedLine());
 		}
 	}
 	
@@ -250,11 +256,12 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 	public void changedUpdate(DocumentEvent e) { }
 	
 	public void showSuggestions(String token) {
-		Iterator<String> it = callbacks.getSuggestions(token);
+		Iterator<String> it = callbacks.getWordSuggestions(token);
+		Iterator<String> it2 = callbacks.getSentenceSuggestions(token);
 		if (it == null) {
 			suggestionsFrame.setVisible(false);
 		} else {
-			suggestionsFrame.updateSuggestions(token, it);
+			suggestionsFrame.updateSuggestions(token, it, it2);
 			if (!suggestionsFrame.isVisible()) {
 				try {
 					Point p = getLocationOnScreen();
@@ -326,7 +333,9 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 	}
 	
 	protected class SuggestionsFrame extends JFrame implements KeyListener, ComponentListener {
-		private List list;
+		private List wordlist;
+		private List sentencelist;
+		private JPanel panel = new JPanel();
 		
 		public SuggestionsFrame() {
 			initialize();
@@ -337,27 +346,46 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 			setAlwaysOnTop(true);
 			setResizable(true);
 			addKeyListener(this);
-			list = new List();
-			list.setFocusable(false);
+			setLayout(new BorderLayout());
+			wordlist = new List();
+			wordlist.setFocusable(false);
 			ScrollPane sp = new ScrollPane();
-			sp.add(list);
-			add(sp);
+			sp.add(wordlist);
+			add("West",sp);
+			sentencelist = new List();
+			sentencelist.setFocusable(false);
+			ScrollPane sp2 = new ScrollPane();
+			sp2.add(sentencelist);
+			add("Center",sp2);
 			setVisible(false);
 			setPreferredSize(new Dimension(500, 200));
 		}
 		
-		public void updateSuggestions(String token, Iterator<String> it) {
-			String selected = list.getSelectedItem();
-			list.removeAll();
+		public void updateSuggestions(String token, Iterator<String> it,Iterator<String> it2) {
+			String selected = wordlist.getSelectedItem();
+			wordlist.removeAll();
 			while (it.hasNext()) {
 				String s = it.next();
-				list.add(s);
+				wordlist.add(s);
 				if (selected != null && selected.equals(s)) {
-					list.select(list.getItemCount()-1);
+					wordlist.select(wordlist.getItemCount()-1);
 				}
 			}
-			if (list.getItemCount() == 1) {
-				list.select(0);
+			if (wordlist.getItemCount() == 1) {
+				wordlist.select(0);
+			}
+			
+			String selected2 = sentencelist.getSelectedItem();
+			sentencelist.removeAll();
+			while (it2.hasNext()) {
+				String s = it2.next();
+				sentencelist.add(s);
+				if (selected2 != null && selected2.equals(s)) {
+					sentencelist.select(sentencelist.getItemCount()-1);
+				}
+			}
+			if (sentencelist.getItemCount() == 1) {
+				sentencelist.select(0);
 			}
 		}
 
@@ -365,10 +393,10 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 		public void keyPressed(KeyEvent e) {
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
-				list.select(list.getSelectedIndex()-1);
+				wordlist.select(wordlist.getSelectedIndex()-1);
 				break;
 			case KeyEvent.VK_DOWN:
-				list.select(list.getSelectedIndex()+1);
+				wordlist.select(wordlist.getSelectedIndex()+1);
 				break;
 			case KeyEvent.VK_ESCAPE:
 				setVisible(false);
