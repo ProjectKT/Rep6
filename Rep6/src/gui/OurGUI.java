@@ -5,10 +5,16 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.List;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,12 +40,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.BadLocationException;
 
 import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
-
 import components.DataFilter;
 import components.HighlightedTextPane;
 import components.RuleTextPane;
@@ -84,6 +90,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	JPanel radioPanel = new JPanel();
 	JPanel p1;
 	JPanel p2;
+	RuleSuggestionsFrame suggestionsFrame = new RuleSuggestionsFrame();
 
     
     /**
@@ -100,14 +107,43 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			osa.deleteSuffixRule(rule.getName());
 		}
 		
-		public Iterator<String> getWordSuggestions(String input) {
+		@Override
+		public void onRuleModified(String line) {
+			showSuggestions(line);
+		}
+		
+		private void showSuggestions(String input) {
+			Iterator<String> it = getWordSuggestions(input);
+			Iterator<String> it2 = getSentenceSuggestions(input);
+			if (it == null) {
+				suggestionsFrame.setVisible(false);
+			} else {
+				suggestionsFrame.updateSuggestions(input, it, it2);
+				Point p = ruleTextPane.getLocationOnScreen();
+				try {
+					Rectangle rect = ruleTextPane.modelToView(ruleTextPane.getCaretPosition());
+					if (!suggestionsFrame.isVisible()) {
+						final int x = p.x + rect.x;
+						final int y = p.y + rect.y + getFont().getSize() + 2; // FIXME
+						final int w = ruleTextPane.getWidth();
+						final int h = ruleTextPane.getHeight();
+						suggestionsFrame.setBounds(x, y, w, h);
+						suggestionsFrame.setVisible(true);
+						toFront();
+					}
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		private Iterator<String> getWordSuggestions(String input) {
 			System.out.println(input);
 			String[] words = input.split(" ");
 			return osa.getWords(words[words.length-1]);
 		}
 		
-		@Override
-		public Iterator<String> getSentenceSuggestions(String input) {
+		private Iterator<String> getSentenceSuggestions(String input) {
 			System.out.println(input);
 			return osa.getCorrectSentencesHard(input);
 		}
@@ -532,5 +568,103 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	public void componentShown(ComponentEvent e) { }
 	@Override
 	public void componentHidden(ComponentEvent e) { }
+	
+	
+	/**
+	 * ルール編集時の Suggestions 表示フレーム
+	 */
+	protected class RuleSuggestionsFrame extends JFrame implements KeyListener, ComponentListener {
+		private List wordlist;
+		private List sentencelist;
+		private JPanel panel = new JPanel();
+		
+		public RuleSuggestionsFrame() {
+			initialize();
+		}
+		
+		private void initialize() {
+			setUndecorated(true);
+			setAlwaysOnTop(true);
+			setResizable(true);
+			addKeyListener(this);
+			addComponentListener(this);
+			setLayout(new BorderLayout());
+			wordlist = new List();
+			wordlist.setFocusable(false);
+			ScrollPane sp = new ScrollPane();
+			sp.add(wordlist);
+			add("West",sp);
+			sentencelist = new List();
+			sentencelist.setFocusable(false);
+			ScrollPane sp2 = new ScrollPane();
+			sp2.add(sentencelist);
+			add("Center",sp2);
+			setVisible(false);
+			setPreferredSize(new Dimension(500, 200));
+		}
+		
+		public void updateSuggestions(String token, Iterator<String> it,Iterator<String> it2) {
+			String selected = wordlist.getSelectedItem();
+			wordlist.removeAll();
+			while (it.hasNext()) {
+				String s = it.next();
+				wordlist.add(s);
+				if (selected != null && selected.equals(s)) {
+					wordlist.select(wordlist.getItemCount()-1);
+				}
+			}
+			if (wordlist.getItemCount() == 1) {
+				wordlist.select(0);
+			}
+			
+			String selected2 = sentencelist.getSelectedItem();
+			sentencelist.removeAll();
+			while (it2.hasNext()) {
+				String s = it2.next();
+				sentencelist.add(s);
+				if (selected2 != null && selected2.equals(s)) {
+					sentencelist.select(sentencelist.getItemCount()-1);
+				}
+			}
+			if (sentencelist.getItemCount() == 1) {
+				sentencelist.select(0);
+			}
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_UP:
+				wordlist.select(wordlist.getSelectedIndex()-1);
+				e.consume();
+				break;
+			case KeyEvent.VK_DOWN:
+				wordlist.select(wordlist.getSelectedIndex()+1);
+				e.consume();
+				break;
+			case KeyEvent.VK_ESCAPE:
+				setVisible(false);
+				e.consume();
+				break;
+			}
+		}
+		@Override
+		public void keyTyped(KeyEvent e) { }
+		@Override
+		public void keyReleased(KeyEvent e) { }
+		@Override
+		public void componentResized(ComponentEvent e) { }
+		@Override
+		public void componentMoved(ComponentEvent e) { }
+		@Override
+		public void componentShown(ComponentEvent e) {
+			ruleTextPane.addKeyListener(this);
+		}
+		@Override
+		public void componentHidden(ComponentEvent e) {
+			ruleTextPane.removeKeyListener(this);
+		}
+
+	}
 }
 
