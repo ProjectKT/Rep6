@@ -109,13 +109,13 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		
 		@Override
 		public void onRuleModified(String line) {
-			showSuggestions(line);
+			updateSuggestions(line);
 		}
 		
-		private void showSuggestions(String input) {
+		private void updateSuggestions(String input) {
 			Iterator<String> it = getWordSuggestions(input);
 			Iterator<String> it2 = getSentenceSuggestions(input);
-			if (it == null) {
+			if (!it.hasNext() && !it2.hasNext()) {
 				suggestionsFrame.setVisible(false);
 			} else {
 				suggestionsFrame.updateSuggestions(input, it, it2);
@@ -574,8 +574,8 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	 * ルール編集時の Suggestions 表示フレーム
 	 */
 	protected class RuleSuggestionsFrame extends JFrame implements KeyListener, ComponentListener {
-		private List wordlist;
-		private List sentencelist;
+		private List wordList;
+		private List sentenceList;
 		private JPanel panel = new JPanel();
 		
 		public RuleSuggestionsFrame() {
@@ -589,45 +589,45 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			addKeyListener(this);
 			addComponentListener(this);
 			setLayout(new BorderLayout());
-			wordlist = new List();
-			wordlist.setFocusable(false);
+			wordList = new List();
+			wordList.setFocusable(false);
 			ScrollPane sp = new ScrollPane();
-			sp.add(wordlist);
+			sp.add(wordList);
 			add("West",sp);
-			sentencelist = new List();
-			sentencelist.setFocusable(false);
+			sentenceList = new List();
+			sentenceList.setFocusable(false);
 			ScrollPane sp2 = new ScrollPane();
-			sp2.add(sentencelist);
+			sp2.add(sentenceList);
 			add("Center",sp2);
 			setVisible(false);
 			setPreferredSize(new Dimension(500, 200));
 		}
 		
 		public void updateSuggestions(String token, Iterator<String> it,Iterator<String> it2) {
-			String selected = wordlist.getSelectedItem();
-			wordlist.removeAll();
+			String selected = wordList.getSelectedItem();
+			wordList.removeAll();
 			while (it.hasNext()) {
 				String s = it.next();
-				wordlist.add(s);
+				wordList.add(s);
 				if (selected != null && selected.equals(s)) {
-					wordlist.select(wordlist.getItemCount()-1);
+					wordList.select(wordList.getItemCount()-1);
 				}
 			}
-			if (wordlist.getItemCount() == 1) {
-				wordlist.select(0);
+			if (wordList.getItemCount() == 1) {
+				wordList.select(0);
 			}
 			
-			String selected2 = sentencelist.getSelectedItem();
-			sentencelist.removeAll();
+			String selected2 = sentenceList.getSelectedItem();
+			sentenceList.removeAll();
 			while (it2.hasNext()) {
 				String s = it2.next();
-				sentencelist.add(s);
+				sentenceList.add(s);
 				if (selected2 != null && selected2.equals(s)) {
-					sentencelist.select(sentencelist.getItemCount()-1);
+					sentenceList.select(sentenceList.getItemCount()-1);
 				}
 			}
-			if (sentencelist.getItemCount() == 1) {
-				sentencelist.select(0);
+			if (sentenceList.getItemCount() == 1) {
+				sentenceList.select(0);
 			}
 		}
 
@@ -635,14 +635,26 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		public void keyPressed(KeyEvent e) {
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
-				wordlist.select(wordlist.getSelectedIndex()-1);
+				wordList.select(wordList.getSelectedIndex()-1);
 				e.consume();
 				break;
 			case KeyEvent.VK_DOWN:
-				wordlist.select(wordlist.getSelectedIndex()+1);
+				wordList.select(wordList.getSelectedIndex()+1);
 				e.consume();
 				break;
 			case KeyEvent.VK_ESCAPE:
+				setVisible(false);
+				e.consume();
+			case KeyEvent.VK_ENTER:
+				int selectedIndex = wordList.getSelectedIndex();
+				if (0 <= selectedIndex) {
+					String word = wordList.getItem(selectedIndex);
+					try {
+						ruleTextPane.replaceLastEditedLine(word);
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+				}
 				setVisible(false);
 				e.consume();
 				break;

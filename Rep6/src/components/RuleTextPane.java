@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
@@ -177,6 +178,28 @@ public class RuleTextPane extends HighlightedTextPane implements HighlightedText
 	 */
 	public void setCallbacks(Callbacks callbacks) {
 		this.callbacks = (callbacks == null) ? sDummyCallbacks : callbacks;
+	}
+	
+	/**
+	 * 最後に編集したトークンを置き換える
+	 * @param str
+	 * @throws BadLocationException 
+	 */
+	public void replaceLastEditedToken(String str) throws BadLocationException {
+		int len = getLastEditedToken().length();
+		getDocument().remove(getCaretPosition()-len, len);
+		getDocument().insertString(getCaretPosition(), str, null);
+	}
+	
+	/**
+	 * 最後に編集した行を置き換える
+	 * @param str
+	 * @throws BadLocationException 
+	 */
+	public void replaceLastEditedLine(String str) throws BadLocationException {
+		int len = getLastEditedLine().length();
+		getDocument().remove(getCaretPosition()-len, len);
+		getDocument().insertString(getCaretPosition(), str, null);
 	}
 	
 	/**
