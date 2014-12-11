@@ -100,9 +100,16 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			osa.deleteSuffixRule(rule.getName());
 		}
 		
+		public Iterator<String> getWordSuggestions(String input) {
+			System.out.println(input);
+			String[] words = input.split(" ");
+			return osa.getWords(words[words.length-1]);
+		}
+		
 		@Override
-		public Iterator<String> getSuggestions(String input) {
-			return osa.getAllSentences(input);
+		public Iterator<String> getSentenceSuggestions(String input) {
+			System.out.println(input);
+			return osa.getCorrectSentencesHard(input);
 		}
 	};
     
