@@ -35,6 +35,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -576,30 +577,37 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	protected class RuleSuggestionsFrame extends JFrame implements KeyListener, ComponentListener {
 		private List wordList;
 		private List sentenceList;
-		private JPanel panel = new JPanel();
 		
 		public RuleSuggestionsFrame() {
 			initialize();
 		}
 		
 		private void initialize() {
+			setVisible(false);
+			
 			setUndecorated(true);
 			setAlwaysOnTop(true);
 			setResizable(true);
 			addKeyListener(this);
 			addComponentListener(this);
-			setLayout(new BorderLayout());
+
+			JSplitPane splitPane = new JSplitPane();
+			splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+			splitPane.setResizeWeight(0.5);
+			getContentPane().add(splitPane);
+			
 			wordList = new List();
-			wordList.setFocusable(false);
-			ScrollPane sp = new ScrollPane();
-			sp.add(wordList);
-			add("West",sp);
+			wordList.setFocusable(true);
+			ScrollPane sp1 = new ScrollPane();
+			sp1.add(wordList);
+			splitPane.setLeftComponent(sp1);
+			
 			sentenceList = new List();
-			sentenceList.setFocusable(false);
+			sentenceList.setFocusable(true);
 			ScrollPane sp2 = new ScrollPane();
 			sp2.add(sentenceList);
-			add("Center",sp2);
-			setVisible(false);
+			splitPane.setRightComponent(sp2);
+			
 			setPreferredSize(new Dimension(500, 200));
 		}
 		
@@ -635,28 +643,64 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		public void keyPressed(KeyEvent e) {
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
-				wordList.select(wordList.getSelectedIndex()-1);
-				e.consume();
+//				if (wordList.hasFocus()) {
+					wordList.select(wordList.getSelectedIndex()-1);
+					e.consume();
+//				} else if (sentenceList.hasFocus()) {
+//					sentenceList.select(sentenceList.getSelectedIndex()-1);
+//					e.consume();
+//				}
 				break;
 			case KeyEvent.VK_DOWN:
-				wordList.select(wordList.getSelectedIndex()+1);
+//				if (wordList.hasFocus()) {
+					wordList.select(wordList.getSelectedIndex()+1);
+					e.consume();
+//				} else if (sentenceList.hasFocus()) {
+//					sentenceList.select(sentenceList.getSelectedIndex()+1);
+//					e.consume();
+//				}
+				break;
+			case KeyEvent.VK_LEFT:
+				if (!wordList.hasFocus()) {
+					wordList.requestFocusInWindow();
+				}
+				e.consume();
+				break;
+			case KeyEvent.VK_RIGHT:
+				if (!sentenceList.hasFocus()) {
+					sentenceList.requestFocusInWindow();
+				}
 				e.consume();
 				break;
 			case KeyEvent.VK_ESCAPE:
 				setVisible(false);
 				e.consume();
+				break;
 			case KeyEvent.VK_ENTER:
-				int selectedIndex = wordList.getSelectedIndex();
-				if (0 <= selectedIndex) {
-					String word = wordList.getItem(selectedIndex);
-					try {
-						ruleTextPane.replaceLastEditedLine(word);
-					} catch (BadLocationException e1) {
-						e1.printStackTrace();
+//				if (wordList.hasFocus()) {
+					int selectedIndex = wordList.getSelectedIndex();
+					if (0 <= selectedIndex) {
+						String word = wordList.getItem(selectedIndex);
+						try {
+							ruleTextPane.replaceLastEditedToken(word);
+						} catch (BadLocationException e1) {
+							e1.printStackTrace();
+						}
 					}
-				}
+					e.consume();
+//				} else if (sentenceList.hasFocus()) {
+//					int selectedIndex = sentenceList.getSelectedIndex();
+//					if (0 <= selectedIndex) {
+//						String sentence = sentenceList.getItem(selectedIndex);
+//						try {
+//							ruleTextPane.replaceLastEditedLine(sentence);
+//						} catch (BadLocationException e1) {
+//							e1.printStackTrace();
+//						}
+//					}
+//					e.consume();
+//				}
 				setVisible(false);
-				e.consume();
 				break;
 			}
 		}
