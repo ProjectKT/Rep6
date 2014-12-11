@@ -1,0 +1,63 @@
+rule 	"SportsRule1"
+if 	"?x use ball"
+then 	"?x play ballGame"
+
+rule 	"SportsRule2"
+if 	"?x play ballGame"
+	"?x use foot"
+then 	"?x play soccer"
+
+rule 	"SportsRule3"
+if 	"?x play ballGame"
+	"?x playWith 11"
+then 	"?x play soccer"
+
+rule 	"SportsRule4"
+if 	"?x play ballGame"
+	"?x use bat"
+then 	"?x play baseball"
+
+rule 	"SportsRule5"
+if 	"?x play ballGame"
+	"?x playWith 9"
+then 	"?x play baseball"
+
+rule 	"SportsRule6"
+if 	"?x play ballGame"
+	"?x playWith 5"
+then 	"?x play basketball"
+
+rule 	"SportsRule7"
+if 	"?x play ballGame"
+	"?x don't-catch ball"
+then 	"?x play volleyball"
+
+rule 	"SportsRule8"
+if 	"?x play ballGame"
+	"?x playWith 6"
+then 	"?x play volleyball"
+
+rule 	"SportsRule9"
+if 	"?x wear obi"
+then 	"?x play judo"
+
+rule 	"SportsRule10"
+if 	"?x use shinai "
+then 	"?x play kendo"
+
+rule 	"SportsRule11"
+if 	"?x use bow"
+then 	"?x play kyudo"
+
+rule 	"SportsRule12"
+if 	"?x playIn pool "
+then 	"?x play swimming"
+
+rule 	"SportsRule13"
+if 	"?x run shortDistance"
+then 	"?x play splint"
+
+rule 	"SportsRule14"
+if 	"?x run longDistance"
+then 	"?x play marathon"
+

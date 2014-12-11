@@ -46,8 +46,8 @@ import components.RuleTextPane;
 
 public class OurGUI extends JFrame implements ActionListener , ComponentListener, ChangeListener{
 
-	private String currentRuleFileName = "CarShop.data";
-	private String currentWmFileName = "CarShopWm.data";
+	private String currentRuleFileName = "OurRule.data";
+	private String currentWmFileName = "OurWm.data";
 	
 	// --- ロジックのメンバ ---
 	String data="data";
