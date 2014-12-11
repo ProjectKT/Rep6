@@ -46,8 +46,8 @@ import components.RuleTextPane;
 
 public class OurGUI extends JFrame implements ActionListener , ComponentListener, ChangeListener{
 
-	private String currentRuleFileName = "AnimalWorld.data";
-	private String currentWmFileName = "AnimalWorldWm.data";
+	private String currentRuleFileName = "CarShop.data";
+	private String currentWmFileName = "CarShopWm.data";
 	
 	// --- ロジックのメンバ ---
 	String data="data";
@@ -444,6 +444,12 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		} else if (s == forward) {
 			rb = new RuleBase(rules, wm);
 			rb.forwardChain();
+			String ans="新しいルールが生成されました\n--------------------\n";
+			for(String str:rb.getForwardAnswer()){
+				ans += str + "\n";
+			}
+				aa.setText(ans);
+			
 		} else if (s == backward) {
 			rb = new RuleBase(rules, wm);
 			ArrayList<String> temptf = new ArrayList<String>();
@@ -452,6 +458,12 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 				temptf.add(str);
 			}
 			rb.backwardChain(temptf);
+			String ans="";
+			for(String str:rb.getBackwardAnswer()){
+				ans += str + "\n";
+			}
+				aa.setText(ans);
+			
 		} else if (s == mntmSaveRuleFile) {
 			saveRuleFile(currentRuleFileName);
 		} else if (s == mntmSaveWMFile) {
