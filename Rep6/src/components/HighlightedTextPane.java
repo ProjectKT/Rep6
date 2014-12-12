@@ -45,6 +45,9 @@ import utils.CharArrayTokenizer;
  */
 public class HighlightedTextPane extends JTextPane {
 	
+	public static final char[] DELIMITERS = new char[]{' ','\n','\r','\t','\f'};
+	public static final char[] LINE_BREAKS = new char[]{'\n','\r'};
+	
 	/** dummy interface implementation */
 	private static final TokenHighlighter sDummyTokenHighlighter = new TokenHighlighter() {
 		@Override
@@ -55,8 +58,6 @@ public class HighlightedTextPane extends JTextPane {
 	private final CustomUndoManager undoManager = new CustomUndoManager();
 	private CustomDocument document;
 	/** TokenHighlighter */
-	private char[] delimiters = new char[]{' ','\n','\r','\t','\f'};
-	private char[] delimiters2 = new char[]{'\n'};
 	private TokenHighlighter tokenHighlighter = sDummyTokenHighlighter;
 	/** default attribute set applied to tokens  when null AttributeSet is returned from {@link HighlightedTextPane#TokenHighlighter} */
 	private MutableAttributeSet defaultAttributeSet = new SimpleAttributeSet();
@@ -303,7 +304,7 @@ public class HighlightedTextPane extends JTextPane {
 			Segment txt = new Segment();
 			getText(0, getLength(), txt);
 //			System.out.println("getTokenizer(): (len="+getLength()+"), "+txt+", offset="+txt.offset+", count="+txt.count);
-			return new CharArrayTokenizer(txt.array, delimiters)
+			return new CharArrayTokenizer(txt.array, DELIMITERS)
 						.offset(txt.offset)
 						.limit(txt.count);
 		}
@@ -317,7 +318,7 @@ public class HighlightedTextPane extends JTextPane {
 			Segment txt = new Segment();
 			getText(0, getLength(), txt);
 //			System.out.println("getTokenizer(): (len="+getLength()+"), "+txt+", offset="+txt.offset+", count="+txt.count);
-			return new CharArrayTokenizer(txt.array, delimiters2)
+			return new CharArrayTokenizer(txt.array, LINE_BREAKS)
 						.offset(txt.offset)
 						.limit(txt.count);
 		}

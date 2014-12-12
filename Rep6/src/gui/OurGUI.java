@@ -47,6 +47,7 @@ import providers.FileManager;
 import providers.OurSuffixArray;
 import providers.Rule;
 import system.RuleBase;
+import utils.CharArrayTokenizer;
 import components.DataFilter;
 import components.HighlightedTextPane;
 import components.RuleTextPane;
@@ -114,12 +115,23 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		}
 		
 		private void updateSuggestions(String input) {
-			Iterator<String> it = getWordSuggestions(input);
-			Iterator<String> it2 = getSentenceSuggestions(input);
-			if (!it.hasNext() && !it2.hasNext()) {
+			CharArrayTokenizer cat = new CharArrayTokenizer(input.toCharArray(), HighlightedTextPane.DELIMITERS);
+			final String firstToken = cat.hasMoreTokens() ? cat.nextToken() : "";
+			final Iterator<String> itSentences;
+			if (firstToken.equalsIgnoreCase("if") || firstToken.equalsIgnoreCase("then")) {
+				itSentences = osa.getCorrectSentencesHard(input.substring(firstToken.length()).trim());
+			} else {
+				itSentences = osa.getCorrectSentencesHard(input);
+			}
+			
+			cat = cat.from(input.length()).reverse();
+			final String lastToken = cat.hasMoreTokens() ? cat.nextToken() : "";
+			final Iterator<String> itWord = osa.getWords(lastToken);
+			
+			if (!itWord.hasNext() && !itSentences.hasNext()) {
 				suggestionsFrame.setVisible(false);
 			} else {
-				suggestionsFrame.updateSuggestions(input, it, it2);
+				suggestionsFrame.updateSuggestions(input, itWord, itSentences);
 				Point p = ruleTextPane.getLocationOnScreen();
 				try {
 					Rectangle rect = ruleTextPane.modelToView(ruleTextPane.getCaretPosition());
@@ -136,17 +148,6 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 					e.printStackTrace();
 				}
 			}
-		}
-		
-		private Iterator<String> getWordSuggestions(String input) {
-			System.out.println(input);
-			String[] words = input.split(" ");
-			return osa.getWords(words[words.length-1]);
-		}
-		
-		private Iterator<String> getSentenceSuggestions(String input) {
-			System.out.println(input);
-			return osa.getCorrectSentencesHard(input);
 		}
 	};
     
@@ -577,6 +578,8 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 	protected class RuleSuggestionsFrame extends JFrame implements KeyListener, ComponentListener {
 		private List wordList;
 		private List sentenceList;
+		// 操作対象のリスト
+		private List manipulatingList;
 		
 		public RuleSuggestionsFrame() {
 			initialize();
@@ -597,18 +600,19 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			getContentPane().add(splitPane);
 			
 			wordList = new List();
-			wordList.setFocusable(true);
+			wordList.setFocusable(false);
 			ScrollPane sp1 = new ScrollPane();
 			sp1.add(wordList);
 			splitPane.setLeftComponent(sp1);
 			
 			sentenceList = new List();
-			sentenceList.setFocusable(true);
+			sentenceList.setFocusable(false);
 			ScrollPane sp2 = new ScrollPane();
 			sp2.add(sentenceList);
 			splitPane.setRightComponent(sp2);
 			
 			setPreferredSize(new Dimension(500, 200));
+			manipulatingList = wordList;
 		}
 		
 		public void updateSuggestions(String token, Iterator<String> it,Iterator<String> it2) {
@@ -643,32 +647,32 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 		public void keyPressed(KeyEvent e) {
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
-//				if (wordList.hasFocus()) {
-					wordList.select(wordList.getSelectedIndex()-1);
+				if (manipulatingList != null) {
+					manipulatingList.select(manipulatingList.getSelectedIndex()-1);
 					e.consume();
-//				} else if (sentenceList.hasFocus()) {
-//					sentenceList.select(sentenceList.getSelectedIndex()-1);
-//					e.consume();
-//				}
+				}
 				break;
 			case KeyEvent.VK_DOWN:
-//				if (wordList.hasFocus()) {
-					wordList.select(wordList.getSelectedIndex()+1);
+				if (manipulatingList != null) {
+					manipulatingList.select(manipulatingList.getSelectedIndex()+1);
 					e.consume();
-//				} else if (sentenceList.hasFocus()) {
-//					sentenceList.select(sentenceList.getSelectedIndex()+1);
-//					e.consume();
-//				}
+				}
 				break;
 			case KeyEvent.VK_LEFT:
-				if (!wordList.hasFocus()) {
-					wordList.requestFocusInWindow();
+				if (manipulatingList == sentenceList) {
+					final int selectedIndex = sentenceList.getSelectedIndex();
+					manipulatingList = wordList;
+					sentenceList.deselect(selectedIndex);
+					wordList.select(Math.min(selectedIndex, wordList.getItemCount()));
 				}
 				e.consume();
 				break;
 			case KeyEvent.VK_RIGHT:
-				if (!sentenceList.hasFocus()) {
-					sentenceList.requestFocusInWindow();
+				if (manipulatingList == wordList) {
+					final int selectedIndex = wordList.getSelectedIndex();
+					manipulatingList = sentenceList;
+					wordList.deselect(selectedIndex);
+					sentenceList.select(Math.min(selectedIndex, sentenceList.getItemCount()));
 				}
 				e.consume();
 				break;
@@ -677,29 +681,22 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 				e.consume();
 				break;
 			case KeyEvent.VK_ENTER:
-//				if (wordList.hasFocus()) {
-					int selectedIndex = wordList.getSelectedIndex();
+				if (manipulatingList != null) {
+					int selectedIndex = manipulatingList.getSelectedIndex();
 					if (0 <= selectedIndex) {
-						String word = wordList.getItem(selectedIndex);
+						String s = manipulatingList.getItem(selectedIndex);
 						try {
-							ruleTextPane.replaceLastEditedToken(word);
+							if (manipulatingList == wordList) {
+								ruleTextPane.replaceLastEditedToken(s);
+							} else if (manipulatingList == sentenceList) {
+								ruleTextPane.replaceLastEditedLine(s);
+							}
 						} catch (BadLocationException e1) {
 							e1.printStackTrace();
 						}
 					}
 					e.consume();
-//				} else if (sentenceList.hasFocus()) {
-//					int selectedIndex = sentenceList.getSelectedIndex();
-//					if (0 <= selectedIndex) {
-//						String sentence = sentenceList.getItem(selectedIndex);
-//						try {
-//							ruleTextPane.replaceLastEditedLine(sentence);
-//						} catch (BadLocationException e1) {
-//							e1.printStackTrace();
-//						}
-//					}
-//					e.consume();
-//				}
+				}
 				setVisible(false);
 				break;
 			}
