@@ -528,12 +528,12 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.addChoosableFileFilter(new DataFilter());
 			fileChooser.setCurrentDirectory(currentDirectory);
-			fileChooser.setDialogTitle("SaveAsWmRuleFile");
+			fileChooser.setDialogTitle("SaveAsWmFile");
 			int selected = fileChooser.showOpenDialog(this);
 			if (selected == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
 				currentDirectory = file.getParentFile();
-				saveRuleFile(file.getName());
+				saveWmFile(file.getName());
 			}
 		}
 	}
