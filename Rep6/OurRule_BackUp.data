@@ -61,4 +61,3 @@ rule 	"SportsRule14"
 if 	"?x run longDistance"
 then 	"?x play marathon"
 
-

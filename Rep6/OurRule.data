@@ -60,4 +60,3 @@ then 	"?x play splint"
 rule 	"SportsRule14"
 if 	"?x run longDistance"
 then 	"?x play marathon"
-

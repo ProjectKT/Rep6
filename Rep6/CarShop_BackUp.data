@@ -11,9 +11,9 @@ if	"?x is expensive"
 then 	"?x is a foreign car"
 
 rule 	"CarRule4"
-if      "?x is big"	
+if	 "?x is big"	
 	"?x needs a lot of gas"
-then    "?x is a foreign car"
+then	 "?x is a foreign car"
 
 rule	"CarRule5"
 if	"?x is made in Japan"   	
@@ -80,4 +80,5 @@ rule 	"CarRule15"
 if 	"?x is a foreign car"
 	"?x is a good face"
 then	"?x is a Jaguar XJ8"
+
 
