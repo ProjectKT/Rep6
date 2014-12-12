@@ -41,30 +41,6 @@ import providers.*;
 			//ルールのセット
 				this.rules = rule;
 		}
-
-		/*
-		 * 	コンストラクタ　引数無しver
-		 * 
-		public RuleBase() {
-			fileName = "CarShop.data";
-			wmFileName = "CarShopWm.data";
-			fm = new FileManager();
-			wm = new WorkingMemory();
-			wmTemp = new ArrayList<String>();
-			wmTemp = fm.loadWm(wmFileName);
-	
-			//ワーキングメモリのセット
-			for(String temp:wmTemp){
-				wm.addAssertion(temp);
-			}
-
-
-			//ルールのセット
-			rules = new ArrayList<Rule>();
-			loadRules(fileName);
-		}
-		
-		*/
 		
 		/**
 		 *  ルールのセット
@@ -365,7 +341,7 @@ import providers.*;
 			return newRule;
 		}
 		
-		/*
+		
 		private ArrayList<String> getVars(String thePattern, ArrayList<String> vars) {
 			StringTokenizer st = new StringTokenizer(thePattern);
 			for (int i = 0; i < st.countTokens();) {
@@ -402,7 +378,7 @@ import providers.*;
 			}
 			return result.trim();
 		}
-		*/
+		
 		
 	}
 	

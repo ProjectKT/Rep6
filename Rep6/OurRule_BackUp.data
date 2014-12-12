@@ -9,7 +9,7 @@ then 	"?x play soccer"
 
 rule 	"SportsRule3"
 if 	"?x play ballGame"
-	"?x playWith 11"
+	"?x playWith eleven"
 then 	"?x play soccer"
 
 rule 	"SportsRule4"
@@ -19,12 +19,12 @@ then 	"?x play baseball"
 
 rule 	"SportsRule5"
 if 	"?x play ballGame"
-	"?x playWith 9"
+	"?x playWith nine"
 then 	"?x play baseball"
 
 rule 	"SportsRule6"
 if 	"?x play ballGame"
-	"?x playWith 5"
+	"?x playWith five"
 then 	"?x play basketball"
 
 rule 	"SportsRule7"
@@ -34,7 +34,7 @@ then 	"?x play volleyball"
 
 rule 	"SportsRule8"
 if 	"?x play ballGame"
-	"?x playWith 6"
+	"?x playWith six"
 then 	"?x play volleyball"
 
 rule 	"SportsRule9"
