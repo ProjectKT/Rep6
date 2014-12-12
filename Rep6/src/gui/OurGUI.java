@@ -140,7 +140,7 @@ public class OurGUI extends JFrame implements ActionListener , ComponentListener
 						final int y = p.y + rect.y + getFont().getSize() + 2; // FIXME
 						final int w = ruleTextPane.getWidth();
 						final int h = ruleTextPane.getHeight();
-						suggestionsFrame.setBounds(x, y, w, h);
+						suggestionsFrame.setBounds(x, y, w, h/5);
 						suggestionsFrame.setVisible(true);
 						toFront();
 					}

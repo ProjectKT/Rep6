@@ -8,6 +8,10 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import utils.CharArrayTokenizer;
+
+import components.HighlightedTextPane;
+
 public class SuffixArray {
 
 	// TreeMapでSuffixArrayを表現
@@ -222,6 +226,11 @@ public class SuffixArray {
 	public Iterator<String> getCorrectSentencesHard(String sentence) {
 		TreeSet<String> returnsentences = new TreeSet<String>();
 		TreeSet<String> checksentences = new TreeSet<String>();
+		//最初がダブルコーテーションなら省く
+		if(sentence.charAt(0) == '"'){
+			sentence = sentence.substring(1);
+		}
+		
 		// 初回どうか判別
 		boolean firstflag = true;
 		String[] words = sentence.split(" ");
@@ -337,7 +346,14 @@ public class SuffixArray {
 	 */
 	public Iterator<String> getWords(String word) {
 		TreeSet<String> words = new TreeSet<String>();
+		//最初がダブルコーテーションなら省く
+		if(word.charAt(0) == '"'){
+			System.out.println(word);
+			word = word.substring(1);
+			System.out.println(word);
+		}
 		Iterator<String> it = setSuffixTree(word);
+
 		while (it.hasNext()) {
 			Iterator<String> it2 = SuffixArray.get(it.next()).getWords();
 			while (it2.hasNext()) {
