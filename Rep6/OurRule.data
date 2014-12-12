@@ -1,62 +1,39 @@
 rule 	"SportsRule1"
-if 	"?x use ball"
-then 	"?x play ballGame"
-
-rule 	"SportsRule2"
-if 	"?x play ballGame"
+if 	"?x playWith eleven"
 	"?x use foot"
 then 	"?x play soccer"
 
-rule 	"SportsRule3"
-if 	"?x play ballGame"
-	"?x playWith eleven"
-then 	"?x play soccer"
-
-rule 	"SportsRule4"
-if 	"?x play ballGame"
-	"?x use bat"
-then 	"?x play baseball"
-
-rule 	"SportsRule5"
-if 	"?x play ballGame"
+rule 	"SportsRule2"
+if 	"?x use bat"
 	"?x playWith nine"
 then 	"?x play baseball"
 
-rule 	"SportsRule6"
-if 	"?x play ballGame"
+rule 	"SportsRule3"
+if 	"?x use ring"
 	"?x playWith five"
 then 	"?x play basketball"
 
-rule 	"SportsRule7"
-if 	"?x play ballGame"
-	"?x don't-catch ball"
-then 	"?x play volleyball"
 
-rule 	"SportsRule8"
-if 	"?x play ballGame"
-	"?x playWith six"
-then 	"?x play volleyball"
-
-rule 	"SportsRule9"
+rule 	"SportsRule4
 if 	"?x wear obi"
 then 	"?x play judo"
 
-rule 	"SportsRule10"
+rule 	"SportsRule5"
 if 	"?x use shinai "
 then 	"?x play kendo"
 
-rule 	"SportsRule11"
+rule 	"SportsRule6"
 if 	"?x use bow"
 then 	"?x play kyudo"
 
-rule 	"SportsRule12"
+rule 	"SportsRule7"
 if 	"?x playIn pool "
 then 	"?x play swimming"
 
-rule 	"SportsRule13"
+rule 	"SportsRule8"
 if 	"?x run shortDistance"
 then 	"?x play splint"
 
-rule 	"SportsRule14"
+rule 	"SportsRule9"
 if 	"?x run longDistance"
 then 	"?x play marathon"
