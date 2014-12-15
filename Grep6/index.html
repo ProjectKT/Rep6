@@ -4,14 +4,14 @@
   <meta charset="EUC-JP">
 
   <!--
-   �ǥե���ȤΥ�������
-   ��긫�䤹���ѹ����Ƥ��ɤ�
+   デフォルトのスタイル
+   より見やすく変更しても良い
   -->
   <link rel="stylesheet" href="default.css"/>
 
   <!--
     SyntaxHighlighter 3.0.83 (http://alexgorbatchev.com/SyntaxHighlighter/)
-    Java �Υ����ɤ��ɤߤ䤹������
+    Java のコードを読みやすくする
   -->
   <link rel="stylesheet" href="shCore.css"/>
   <link rel="stylesheet" href="shThemeDjango.css"/>
@@ -19,7 +19,7 @@
   <script src="shBrushJava.js"></script>
   <script>SyntaxHighlighter.all();</script>
 
-  <title>��ǽ�ץ�����ߥ󥰱齬II���롼�׺��� ��ݡ���</title>
+  <title>知能プログラミング演習IIグループ作成 レポート</title>
 
   <style type="text/css">
 <!--
@@ -55,35 +55,35 @@ ul.screenshots ul > li p {
   </style>
 </head>
 
-<!-- ���Υ��롼�׺��������ϡ�Ʊ���ե������������GrepX��Grep5��Grep6���˥ǥ��쥯�ȥ�˥��ԡ������֤����� -->
+<!-- このグループ作成資料は，同じファイルを全員のGrepX（Grep5やGrep6等）ディレクトリにコピーして置くこと -->
 
 <body>
-<!-- ���롼���ֹ��񤯡�-->
-<h1>���롼��1</h1>
+<!-- グループ番号を書く．-->
+<h1>グループ1</h1>
 
-<!-- ���롼��������̾��, �����ֹ��񤭡��Ŀͺ�������ؤΥ�󥯤�ĥ�� -->
-<h2>���С�</h2>
+<!-- グループ全員の名前, 学籍番号を書き，個人作成書類へのリンクを張る -->
+<h2>メンバー</h2>
 <ul>
-<li><a href="../../../../cjh15067/workspace/kprep/rep6/index.html">��ƣ��δ 24115067</a></li>
-<li><a href="../../../../cjh15088/workspace/kprep/rep6/index.html">�����µ� 24115088</a></li>
-<li><a href="../../../../cjh15109/workspace/kprep/rep6/index.html">����� 2411109</a></li>
-<li><a href="../../../../cjh15110/workspace/kprep/rep6/index.html">�ӹ��� 2411110</a></li>
-<li><a href="../../../../cjh15113/workspace/kprep/rep6/index.html">������ 2411113</a></li>
+<li><a href="../../../../cjh15067/workspace/kprep/rep6/index.html">佐藤清隆 24115067</a></li>
+<li><a href="../../../../cjh15088/workspace/kprep/rep6/index.html">寺部和紀 24115088</a></li>
+<li><a href="../../../../cjh15109/workspace/kprep/rep6/index.html">早川駿 2411109</a></li>
+<li><a href="../../../../cjh15110/workspace/kprep/rep6/index.html">林幸汰 2411110</a></li>
+<li><a href="../../../../cjh15113/workspace/kprep/rep6/index.html">林政行 2411113</a></li>
 </ul>
 
-<h2>���ʬô</h2>
-<!-- ���ʬô��񤯡�-->
+<h2>役割分担</h2>
+<!-- 役割分担を書く．-->
 <ul>
-<li>��ƣ��δ :�롼��١������롼�����</li>
-<li>�����µ� :GUI���롼�����</li>
-<li>����� :GUI���롼�����</li>
-<li>�ӡ����� :�����䴰�˻Ȥ�SuffixArray�κ�����GUI����ٱ�</li>
-<li>�ӡ����� :�롼��κ������Խ�������Υ����ƥ�ڤӤ���UI����</li>
+<li>佐藤清隆 :ルールベース、ルール作成</li>
+<li>寺部和紀 :GUI、ルール作成</li>
+<li>早川　駿 :GUI、ルール作成</li>
+<li>林　幸汰 :入力補完に使うSuffixArrayの作成、GUI制作支援</li>
+<li>林　政行 :ルールの作成、編集、削除のシステム及びそのUI作成</li>
 </ul>
 
 
 
-<h2>�������ե�����</h2>
+<h2>ソースファイル</h2>
 <ul>
 <li><a href="../../Rep6/src/components/DataFilter.java">DataFilter.java</a></li>
 <li><a href="../../Rep6/src/components/HighlightedTextPane.java">HighlightedTextPane.java</a></li>
@@ -102,60 +102,75 @@ ul.screenshots ul > li p {
 <li><a href="../../Rep6/src/utils/CharArrayStreamTokenizer.java">CharArrayStreamTokenizer.java</a></li>
 <li><a href="../../Rep6/src/utils/CharArrayTokenizer.java">CharArrayTokenizer.java</a></li>
 
-<!-- �������ѹ������������ե�����ؤΥ�󥯡��������롥 -->
-<!-- �� ��󥯤����Хѥ����ѹ��������嵭�Τ褦�����Хѥ��Τޤޤǡ� -->
+<!-- 実装・変更したソースファイルへのリンク．修正する． -->
+<!-- ※ リンクは絶対パスに変更せず，上記のような相対パスのままで！ -->
 </ul>
 
 <hr>
 
-<h2>����</h2>
-<!-- �����񤯡�-->
+<h2>課題</h2>
+<!-- 課題を書く．-->
 
-    [ɬ�ܲ���6-1] CarShop.data ��º�Ū�ʱ��ѻ���˽񤭴����ơ�����������������Ӹ�����������˴�Ť�������������ƥ���������ʶ��ʽ�p.132 ��������1�ˡ�<br>
+    [必須課題6-1] CarShop.data を実際的な応用事例に書き換えて，前向き推論，および後ろ向き推論に基づく質問応答システムを作成せよ（教科書p.132 練習問題1）．<br>
 
-    [ȯŸ����6-2] �嵭6-1�Ǽ�������������������ƥ��GUI��������补
-    ������������Ǥʤ����롼����Խ����ɲá�������ѹ��ˤʤɤˤĤ��Ƥ�GUI�ǹԤ���褦�ˤ��补<br>
+    [発展課題6-2] 上記6-1で実装した質問応答システムのGUIを作成せよ．
+    質問応答だけでなく，ルールの編集（追加，削除，変更）などについてもGUIで行えるようにせよ．<br>
 
-    [ȯŸ����6-3] ���롼�פǤο�Ľ����������ʪ��ͭ�ʤɤˤĤ��ơ����פ�������Ȥä��ġ���ˤĤ��ơ����롼�׺�������ǹͻ����ʤ�����<br>
-<h3>�ȼ����ͤ�����</h3>
+    [発展課題6-3] グループでの進捗管理や成果物共有などについて，工夫した点や使ったツールについて，グループ作成書類で考察しなさい．<br>
+<h3>独自仕様の説明</h3>
 <!--
- �⤷��ʬ���ȼ��˷�᤿���ͤ�����С�����������񤯡�
+ もし自分で独自に決めた仕様があれば，その説明を書く．
 -->
-GUI�Ǥϡ��롼����Խ�����ƥ����ȥ��ꥢ��ͽ����ϥ��饤�Ȥ��뵡ǽ��������ե졼����礭���˹�碌�ƥƥ����ȥ��ꥢ���礭�����Ѥ��褦�ˤ��������֤Ǽ�����Խ���ʬ��������ڡ����ˤ���������������μ���ܥ�����դ�����
-�Խ��ڡ����ˤϥ롼��ȥ���󥰥����ܥ�����ڤ��ؤ�����褦�ˤʤäƤ��롣�ޤ����롼��ȥ���󥰥���Υ����ɤȥ����ֵ�ǽ�⤢�롣
+<ul>
+<h4>[GUI]</h4>
+　GUIでは、ルールを編集するテキストエリアは予約語をハイライトする機能を持ち、フレームの大きさに合わせてテキストエリアの大きさが変わるようにした。タブで質問と編集を分け、質問ページには前向き後ろ向きの質問ボタンを付けた。<br>
+　編集ページにはルールとワーキングメモリをボタンで切り替えられるようになっている。
+<hr>
+<h4>[入力補完機能]</h4>
+　ルールの編集に際してifの条件にはすでルールやワーキングメモリ内にある文を使わなければ意味がないことに注目し、ルールを記述する際に入力したい文の一部を入力した地点で、入力したいと予測される文章を候補として表示するようにすることにした。<br>
+　また同様にすでにルールやワーキングメモリ内で使用された単語は新しいルール記述の際に利用される可能性が高いので、単語の一部分が入力された時点で候補として単語を表示することにした。<br>
+　上記の入力支援システムを作るに当たって単語や文の一部でも入力された時点ですぐさま候補を出す仕組みとして、SuffixArrayを利用することにした。<br>
+　具体的にはルールとワーキングメモリにある文と単語についてそれぞれのSuffixをTreeMapのキーとして利用し、バリューにはSuffixDataというクラスでそのSuffixがあらわれる単語、文、またそれらが属するルールを保持するようにした。<br>
+　入力が確認されると、SuffixArrayから前方の一致するSuffixを見つけ、さらにそのSuffixを持つ単語、文、ルールを得ることができる。
+<hr>
+<h4>[ファイル管理機能]</h4>
+　RuleとWmそれぞれにファイルを開くOpen、編集中のファイルを保存するSave、編集中のファイルを別名で保存するSaveAs機能をつけた。<br>
+　またファイルの場所をたどるのがだるいことが使っていてわかったので、二回目以降上記の機能を使うときは、前回使ったディレクトリからファイルの選択が始まるようにしてみた。<br>
+　また拡張子dataのファイルを選ぶためのフィルタ機能、データが消えるのを防ぐバックアップ機能をつけた。<br>
+　バックアップ機能はファイルを開いた際勝手に行われる仕様。<br>
+</ul>
+<h3>プログラムの構造</h3>
+<!--  どのような設計をしたか．-->
+JTextPane, JPanel, JButton, JScrollPaneなどを使った。
 
-<h3>�ץ������ι�¤</h3>
-<!--  �ɤΤ褦���߷פ򤷤�����-->
-JTextPane, JPanel, JButton, JScrollPane�ʤɤ�Ȥä���
+個人で実装したので詳細は個人レポートに
 
-�ĿͤǼ��������ΤǾܺ٤ϸĿͥ�ݡ��Ȥ�
-
-<h3>����������</h3>
+<h3>実装の説明</h3>
 <!-- 
- �ɤ������������������������ɤ�ܺ٤��������롥
- �ä˽��פʲս�ϥ�ݡ��Ȥ˥ڡ����Ȥ����������롥
+ どう実装したか，ソースコードを詳細に説明する．
+ 特に重要な箇所はレポートにペーストして説明する．
 -->
 
 <!--
-  �����������ɤ�Ϥ�Ĥ������ <pre> ������Ȥ�
-  class="brush: java" �ǥ��󥿥å����ϥ��饤�Ȥ���
-  ���פ���ʬ�Τߤ�Ž���դ�����ɤ�
+  ソースコードをはりつける時は <pre> タグを使う
+  class="brush: java" でシンタックスハイライトする
+  重要な部分のみを貼り付ければ良い
 -->
 
-�Ŀͥ�ݡ��Ȥ˾ܺ٤�񤭤ޤ���
+個人レポートに詳細を書きました
 
 
-<h3>�¹���</h3>
-<!-- �¹���򼨤���PNG��GIF���γ���ĥ�äƤ��ɤ���-->
+<h3>実行例</h3>
+<!-- 実行例を示す．PNGやGIF等の絵を張っても良い．-->
 
-<!-- �����ե������Ž����� <img> ������Ȥ� -->
+<!-- 画像ファイルを貼る場合は <img> タグを使う -->
 <ul class="screenshots">
 	<li>
 		<ul>
 			<li>
 				<a name="ss2-1"></a>
-				<img src="ss/s001.png" alt="�¹���1" />
-				<p>�¹���1: ͽ��줬�ϥ��饤�Ȥ��졢�����åȤΤ���Ԥ�ϥ��饤�Ȥ���Ƥ���</p>
+				<img src="ss/s001.png" alt="実行例1" />
+				<p>実行例1: 予約語がハイライトされ、キャレットのある行もハイライトされている</p>
 			</li>
 		</ul>
 	</li>
@@ -163,24 +178,25 @@ JTextPane, JPanel, JButton, JScrollPane�ʤɤ�Ȥä���
 		<ul>
 			<li>
 				<a name="ss2-1"></a>
-				<img src="ss/s002.png" alt="�¹���2" />
-				<p>�¹���2: �롼�� Suggestions �Ȥ�Ϣ�Ȥ���</p>
+				<img src="ss/s002.png" alt="実行例2" />
+				<p>実行例2: ルール Suggestions との連携の例</p>
 			</li>
 		</ul>
 	</li>
 </ul>
 
-<h2>���롼�פǤιͻ�</h2>
+<h2>グループでの考察</h2>
 <!-- 
-���롼�׺�������˽񤯤褦�˻��ꤵ�줿�ͻ����ब����н񤯡�
-�⤷���ꤵ�줿�ͻ����ब�ʤ���С��Ŀͺ�������˹ͻ���񤱤Ф褤��
+グループ作成書類に書くように指定された考察事項があれば書く．
+もし指定された考察事項がなければ，個人作成課題に考察を書けばよい．
 -->
-
-���롼�ף��Ǥ�����β��꤫��GitHub��ȤäƤ�����
-��Ľ������LINE�ǡ�����ʪ��ͭ��GitHub��Ȥäƶ�ͭ���Ƥ�����
-����եꥯ�Ȥ������ʤ��褦�ˡ�
-�Ƽ���ô������ץ��������̡��ˤ����ꡢ
-Ʊ��Υץ�������ô�������硢�ºݤ˽��ޤäƺ�Ȥ򤷤��ꤷ����
+<h3>[発展課題6-3]</h3>
+ グループでの進捗管理や成果物共有などについて，工夫した点や使ったツールについて，グループ作成書類で考察しなさい．
+グループ１では前回の課題からGitHubを使っていた。
+進捗管理はLINEで、成果物共有はGitHubを使って共有していた。
+コンフリクトが起きないように、
+各自が担当するプログラムを別々にしたり、
+同一のプログラムを担当する場合、実際に集まって作業をしたりした。
 
 
 
@@ -188,9 +204,9 @@ JTextPane, JPanel, JButton, JScrollPane�ʤɤ�Ȥä���
 
 
 
-<h2>����ʸ��</h2>
+<h2>参考文献</h2>
 
-<!-- ����ʸ����񤯡������Ƥ��ä��ͤ�����С�������-->
+<!-- 参考文献を書く．助けてもらった人がいれば，それも書く-->
 
 
 </body>
