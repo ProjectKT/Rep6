@@ -20,6 +20,39 @@
   <script>SyntaxHighlighter.all();</script>
 
   <title>知能プログラミング演習IIグループ作成 レポート</title>
+
+  <style type="text/css">
+<!--
+ul.screenshots {
+  list-style: none;
+}
+ul.screenshots > li {
+  display: inline-block;
+}
+ul.screenshots ul {
+  list-style: none;
+  padding: 0;
+}
+ul.screenshots ul > li {
+  display: table;
+  border: 1px #aaa solid;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+ul.screenshots ul > li img {
+  max-width: 100%;
+}
+ul.screenshots ul > li p {
+  width: 100%;
+  text-align: center;
+  background: #eee;
+  border-top: 1px #C2C2C2 solid;
+  margin: 0;
+  padding: 7px 0 3px 0;
+  font-size: small;
+}
+-->
+  </style>
 </head>
 
 <!-- このグループ作成資料は，同じファイルを全員のGrepX（Grep5やGrep6等）ディレクトリにコピーして置くこと -->
@@ -88,12 +121,12 @@
 <!--
  もし自分で独自に決めた仕様があれば，その説明を書く．
 -->
-GUIでは、フレームの大きさに合わせてテキストエリアの大きさが変わるようにした。タブで質問と編集を分け、質問ページには前向き後ろ向きの質問ボタンを付けた。
+GUIでは、ルールを編集するテキストエリアは予約語をハイライトする機能を持ち、フレームの大きさに合わせてテキストエリアの大きさが変わるようにした。タブで質問と編集を分け、質問ページには前向き後ろ向きの質問ボタンを付けた。
 編集ページにはルールとワーキングメモリをボタンで切り替えられるようになっている。また、ルールとワーキングメモリのロードとセーブ機能もある。
 
 <h3>プログラムの構造</h3>
 <!--  どのような設計をしたか．-->
-JPanel,JButton,JTextArea,JScrollPaneなどを使った。
+JTextPane, JPanel, JButton, JScrollPaneなどを使った。
 
 個人で実装したので詳細は個人レポートに
 
@@ -116,7 +149,26 @@ JPanel,JButton,JTextArea,JScrollPaneなどを使った。
 <!-- 実行例を示す．PNGやGIF等の絵を張っても良い．-->
 
 <!-- 画像ファイルを貼る場合は <img> タグを使う -->
-
+<ul class="screenshots">
+	<li>
+		<ul>
+			<li>
+				<a name="ss2-1"></a>
+				<img src="ss/s001.png" alt="実行例1" />
+				<p>実行例1: 予約語がハイライトされ、キャレットのある行もハイライトされている</p>
+			</li>
+		</ul>
+	</li>
+	<li>
+		<ul>
+			<li>
+				<a name="ss2-1"></a>
+				<img src="ss/s002.png" alt="実行例2" />
+				<p>実行例2: ルール Suggestions との連携の例</p>
+			</li>
+		</ul>
+	</li>
+</ul>
 
 <h2>グループでの考察</h2>
 <!-- 
